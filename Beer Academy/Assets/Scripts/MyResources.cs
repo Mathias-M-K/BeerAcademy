@@ -7,19 +7,21 @@ using Object = UnityEngine.Object;
 
 public class MyResources : MonoBehaviour
 {
-    public static MyResources Current;
+    public static MyResources current;
     private void Awake()
     {
-        if (Current == null)
+        if (current == null)
         {
-            Current = this;
+            current = this;
         }
         
         InitializeResources();
     }
+    
+    
 
     private readonly Dictionary<Suit, Sprite> _suits = new Dictionary<Suit, Sprite>();
-    private Dictionary<Suit, Color> _suitColors = new Dictionary<Suit, Color>();
+    private readonly Dictionary<Suit, Color> _suitColors = new Dictionary<Suit, Color>();
     
     /// <summary>
     /// Method for fething resources from the resources folder and making them accessible globally.

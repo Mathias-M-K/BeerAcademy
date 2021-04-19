@@ -39,12 +39,12 @@ public class CardDisplay : MonoBehaviour
     {
         foreach (Image image in suits)
         {
-            image.sprite = MyResources.Current.GetSprite(s);
+            image.sprite = MyResources.current.GetSprite(s);
         }
         
         foreach (TextMeshProUGUI rank in ranks)
         {
-            rank.color = MyResources.Current.GetSuitColor(s);
+            rank.color = MyResources.current.GetSuitColor(s);
         }
         
     }
