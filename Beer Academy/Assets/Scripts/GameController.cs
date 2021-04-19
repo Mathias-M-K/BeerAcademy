@@ -7,19 +7,19 @@ using UnityEngine;
 using UnityEngine.Serialization;
 
 public class GameController : MonoBehaviour
-{
-    public GameObject showCard;
-    public GameObject otherCard;
-
-
+{ 
+    public GameObject currentCardPos;
+    public GameObject nextCardPos;
+    public GameObject newCard;
+    
     private Dictionary<int,TextMeshProUGUI> _cardCounters;
-
-
+    
     private void Start()
     {
+        //usedCard.SetActive(false);
+        //currentCard.SetActive(false);
+        
         _cardCounters = GetCardCounters();
-
-        SetCounter(2,6);
     }
 
     // Update is called once per frame
@@ -27,12 +27,38 @@ public class GameController : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Space))
         {
+            GameObject nCard = Instantiate(newCard, 
+                nextCardPos.transform.position, 
+                nextCardPos.transform.rotation,
+                nextCardPos.transform.parent);
             
-            /*
-            GameObject go = Instantiate(otherCard, showCard.transform.position, showCard.transform.rotation,showCard.transform.parent);
-            go.GetComponent<RectTransform>().sizeDelta = showCard.GetComponent<RectTransform>().sizeDelta;
-            Destroy(showCard);
-            */
+            nCard.GetComponent<CardDisplay>().SetCardActive(false);
+            
+            RectTransform nCardRect = nCard.GetComponent<RectTransform>();
+            RectTransform currentCardRect = nextCardPos.GetComponent<RectTransform>();
+            
+            nCardRect.anchorMin = currentCardRect.anchorMin;
+            nCardRect.anchorMax = currentCardRect.anchorMax;
+            nCardRect.anchoredPosition = currentCardRect.anchoredPosition;
+            nCardRect.sizeDelta = currentCardRect.sizeDelta;
+
+
+            nCard.transform.SetAsFirstSibling();
+            
+            LeanTween.move(nextCardPos, currentCardPos.transform.position, 1f).setEase(LeanTweenType.easeInOutQuad);
+            
+            nextCardPos.GetComponent<CardDisplay>().TurnCard();
+            
+            Vector2 xyStart = currentCardRect.sizeDelta;
+            Vector2 xyEnd = currentCardPos.GetComponent<RectTransform>().sizeDelta;
+
+            float aspect = xyStart.y / xyStart.x;
+
+            LeanTween.value(nextCardPos, a =>
+            {
+                currentCardRect.sizeDelta = new Vector2(a, a*aspect);
+
+            }, xyStart.x, xyEnd.x, 1f).setEase(LeanTweenType.easeInOutQuad);
         }
     }
 
@@ -70,6 +96,10 @@ public class GameController : MonoBehaviour
         _cardCounters[cardCounter].text = newValue.ToString();
     }
 
+    /// <summary>
+    /// Sets the counter for all cards. I imagine this will be mostly used to start the game
+    /// </summary>
+    /// <param name="newValue"></param>
     private void SetAllCounters(int newValue)
     {
         foreach (KeyValuePair<int,TextMeshProUGUI> counter in _cardCounters)
