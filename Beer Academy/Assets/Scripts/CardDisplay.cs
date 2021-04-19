@@ -8,7 +8,6 @@ using UnityEngine.UI;
 public class CardDisplay : MonoBehaviour
 {
     private Suit _suit;
-
     private int _currentSuit = 0;
     
     [HideInInspector] public List<Image> suits;
@@ -29,6 +28,10 @@ public class CardDisplay : MonoBehaviour
             _currentSuit++;
 
             _currentSuit = _currentSuit == Enum.GetValues(typeof(Suit)).Length ? 0 : _currentSuit;
+        }
+        if (Input.GetKeyDown(KeyCode.D))
+        {
+            
         }
     }
 

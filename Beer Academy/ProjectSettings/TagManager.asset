@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Rank
   - Suit
+  - CardCounter
   layers:
   - Default
   - TransparentFX
