@@ -18,9 +18,11 @@ public class GameController : MonoBehaviour
 
     //UI
     private Dictionary<int,TextMeshProUGUI> _cardCounters;
+    private readonly Dictionary<int, int> _cardCounterValues = new Dictionary<int, int>();
     
     //Game Functionality
     private readonly List<Card> _cards = new List<Card>();
+    private bool _gameOver;
     
     private void Start()
     {
@@ -37,7 +39,7 @@ public class GameController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKeyDown(KeyCode.Space) && !_gameOver)
         {
             ShowNextCard();
         }
@@ -53,6 +55,8 @@ public class GameController : MonoBehaviour
             }
         }
 
+        SetAllCounters(numberOfPlayers);
+        
         foreach (Card card in _cards)
         {
             Debug.Log($"Rank: {card.rank} | Suit: {card.suit}");
@@ -61,13 +65,24 @@ public class GameController : MonoBehaviour
 
     private void ShowNextCard()
     {
-        GameObject newNextCard = SpawnCard(GetRandomCard());
+        GameObject newNextCard = null;
+        if (_cards.Count > 0)
+        {
+            newNextCard = SpawnCard(GetRandomCard());
+        }
+        else
+        {
+            _gameOver = true;
+        }
+        
 
         LeanTween.move(nextCard, currentCardPos.transform.position, 0.5f).setEase(LeanTweenType.easeInOutQuad);
 
 
         CardDisplay cd = nextCard.GetComponent<CardDisplay>();
         cd.TurnCard(0.5f);
+
+        SubtractOneFromCounter(cd.GetRank());
         
         
         /*
@@ -102,7 +117,7 @@ public class GameController : MonoBehaviour
         nCardRect.sizeDelta = currentCardRect.sizeDelta;
             
         newNextCard.transform.SetAsFirstSibling();
-
+        
         return newNextCard;
     }
 
@@ -114,10 +129,11 @@ public class GameController : MonoBehaviour
         _cards.RemoveAt(randomCardNumber);
 
         GameObject randomCardObj = MyResources.current.GetPlayingCard(randomCard.rank);
-        
-        randomCardObj.GetComponent<CardDisplay>().SetSuit(randomCard.suit);
+
+        CardDisplay randomCardDisplay = randomCardObj.GetComponent<CardDisplay>();
+        randomCardDisplay.SetSuit(randomCard.suit);
+        randomCardDisplay.SetRank(randomCard.rank);
         //randomCardObj.GetComponent<CardDisplay>().suit = randomCard.suit;
-        
         
         Debug.Log($"Returning {randomCard.suit} {randomCard.rank}");
         return randomCardObj;
@@ -158,15 +174,28 @@ public class GameController : MonoBehaviour
         _cardCounters[cardCounter].text = newValue.ToString();
     }
 
+    private void SubtractOneFromCounter(int rank)
+    {
+        _cardCounterValues[rank]--;
+        
+        SetCounter(rank, _cardCounterValues[rank]);
+        
+    }
+
     /// <summary>
     /// Sets the counter for all cards. I imagine this will be mostly used to start the game
     /// </summary>
     /// <param name="newValue"></param>
     private void SetAllCounters(int newValue)
     {
+        _cardCounterValues.Clear();
         foreach (KeyValuePair<int,TextMeshProUGUI> counter in _cardCounters)
         {
             counter.Value.text = newValue.ToString();
+            
+            _cardCounterValues.Add(counter.Key,newValue);
         }
+
+        
     }
 }

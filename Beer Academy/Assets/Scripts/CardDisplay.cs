@@ -10,6 +10,7 @@ using UnityEditor;
 public class CardDisplay : MonoBehaviour
 {
     [SerializeField][HideInInspector] private Suit suit;
+    [SerializeField][HideInInspector] private int rank;
 
     //Card Rotation
     public GameObject cardBack;
@@ -65,9 +66,24 @@ public class CardDisplay : MonoBehaviour
         }
     }
 
-    public void SetSuit(Suit suit)
+    public void SetSuit(Suit newSuit)
     {
-        this.suit = suit;
+        this.suit = newSuit;
+    }
+
+    public Suit GetSuit()
+    {
+        return suit;
+    }
+
+    public void SetRank(int newRank)
+    {
+        this.rank = newRank;
+    }
+
+    public int GetRank()
+    {
+        return rank;
     }
     
     /// <summary>
