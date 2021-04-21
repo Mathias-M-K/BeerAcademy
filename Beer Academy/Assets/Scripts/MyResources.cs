@@ -22,16 +22,19 @@ public class MyResources : MonoBehaviour
 
     private readonly Dictionary<Suit, Sprite> _suits = new Dictionary<Suit, Sprite>();
     private readonly Dictionary<Suit, Color> _suitColors = new Dictionary<Suit, Color>();
+    private Dictionary<int, GameObject> _cards = new Dictionary<int, GameObject>();
     
     /// <summary>
-    /// Method for fething resources from the resources folder and making them accessible globally.
+    /// Method for fetching resources from the resources folder and making them accessible globally.
     /// </summary>
     private void InitializeResources()
     {
+        //Fetching all suit sprites
         var sprites = Resources.LoadAll("Suits", typeof(Sprite));
-
         
+        //We need the sprite renderer to get the pixel data, so we can determine the color of the suit (because i dont wanna save the colors manually)
         SpriteRenderer sr = GetComponent<SpriteRenderer>();
+        
         foreach (Object sprite in sprites)
         {
             string enumString = sprite.name.Split('_')[1];
@@ -53,8 +56,60 @@ public class MyResources : MonoBehaviour
         
         //Removing the sprite renderer, cuz we don't need that
         Destroy(sr);
+        
+        var cards = Resources.LoadAll("Cards_Big");
+
+        foreach (Object card in cards)
+        {
+            _cards.Add(Int32.Parse(card.name.Split('_')[2]), (GameObject) card);
+        }
     }
 
+    #region Get Methods
+    
+    /// <summary>
+    /// Returns the sprite associated with a given suit
+    /// </summary>
+    /// <param name="suit"></param>
+    /// <returns></returns>
+    public Sprite GetSuitSprite(Suit suit)
+    {
+        return _suits[suit];
+    }
+
+    /// <summary>
+    /// Returns a gameobject of a card
+    /// </summary>
+    /// <param name="card"></param>
+    /// <returns></returns>
+    public GameObject GetPlayingCard(int card)
+    {
+        return _cards[card];
+    }
+
+    /// <summary>
+    /// //Returns all playing cards in a dictionary, where the key is the card number (eg. 2 will return playing card two, and 11 will return the jack)
+    /// </summary>
+    /// <returns></returns>
+    public Dictionary<int,GameObject> GetAllPlayingCards()
+    {
+        return _cards;
+    }
+
+    /// <summary>
+    /// Returns the general color of the suit
+    /// </summary>
+    /// <param name="suit"></param>
+    /// <returns></returns>
+    public Color GetSuitColor(Suit suit)
+    {
+        return _suitColors[suit];
+    }
+    
+    #endregion
+    
+    #region Support Methods
+    
     /// <summary>
     /// Checks every 1000 pixel, and returns the first color it finds where the albedo value is one (meaning that it is not transparent)
     /// </summary>
@@ -67,6 +122,7 @@ public class MyResources : MonoBehaviour
         {
             Color c = pixelData[i];
 
+            // ReSharper disable once CompareOfFloatsByEqualityOperator
             if (c.a == 1)
             {
                 return c;
@@ -76,15 +132,7 @@ public class MyResources : MonoBehaviour
         throw new Exception("Couldn't find color");
     }
 
-    public Sprite GetSprite(Suit s)
-    {
-        return _suits[s];
-    }
-
-    public Color GetSuitColor(Suit s)
-    {
-        return _suitColors[s];
-    }
+    #endregion
 }
 
 public enum Suit

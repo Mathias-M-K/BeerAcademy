@@ -1,25 +1,37 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Security.Cryptography;
+using Data_Types;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Serialization;
+using Random = UnityEngine.Random;
+
 
 public class GameController : MonoBehaviour
-{ 
+{
+    [Header("Game Settings")] 
+    public int numberOfPlayers;
+    
+    [Header("Card Flipping Elements")]
     public GameObject currentCardPos;
     public GameObject nextCardPos;
-    public GameObject newCard;
-    
+    public GameObject nextCard;
+
+    //UI
     private Dictionary<int,TextMeshProUGUI> _cardCounters;
+    
+    //Game Functionality
+    private readonly List<Card> _cards = new List<Card>();
     
     private void Start()
     {
-        //usedCard.SetActive(false);
-        //currentCard.SetActive(false);
+        nextCardPos.SetActive(false);
+        currentCardPos.SetActive(false);
         
         _cardCounters = GetCardCounters();
+        
+        SetUp();
+
+        nextCard = SpawnCard(GetRandomCard());
     }
 
     // Update is called once per frame
@@ -27,40 +39,90 @@ public class GameController : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            GameObject nCard = Instantiate(newCard, 
-                nextCardPos.transform.position, 
-                nextCardPos.transform.rotation,
-                nextCardPos.transform.parent);
-            
-            nCard.GetComponent<CardDisplay>().SetCardActive(false);
-            
-            RectTransform nCardRect = nCard.GetComponent<RectTransform>();
-            RectTransform currentCardRect = nextCardPos.GetComponent<RectTransform>();
-            
-            nCardRect.anchorMin = currentCardRect.anchorMin;
-            nCardRect.anchorMax = currentCardRect.anchorMax;
-            nCardRect.anchoredPosition = currentCardRect.anchoredPosition;
-            nCardRect.sizeDelta = currentCardRect.sizeDelta;
-
-
-            nCard.transform.SetAsFirstSibling();
-            
-            LeanTween.move(nextCardPos, currentCardPos.transform.position, 1f).setEase(LeanTweenType.easeInOutQuad);
-            
-            nextCardPos.GetComponent<CardDisplay>().TurnCard();
-            
-            Vector2 xyStart = currentCardRect.sizeDelta;
-            Vector2 xyEnd = currentCardPos.GetComponent<RectTransform>().sizeDelta;
-
-            float aspect = xyStart.y / xyStart.x;
-
-            LeanTween.value(nextCardPos, a =>
-            {
-                currentCardRect.sizeDelta = new Vector2(a, a*aspect);
-
-            }, xyStart.x, xyEnd.x, 1f).setEase(LeanTweenType.easeInOutQuad);
+            ShowNextCard();
         }
     }
+
+    private void SetUp()
+    {
+        for (int i = 2; i <= 14; i++)
+        {
+            for (int y = 0; y < numberOfPlayers; y++)
+            {
+                _cards.Add(new Card(i, (Suit)y));
+            }
+        }
+
+        foreach (Card card in _cards)
+        {
+            Debug.Log($"Rank: {card.rank} | Suit: {card.suit}");
+        }
+    }
+
+    private void ShowNextCard()
+    {
+        GameObject newNextCard = SpawnCard(GetRandomCard());
+
+        LeanTween.move(nextCard, currentCardPos.transform.position, 0.5f).setEase(LeanTweenType.easeInOutQuad);
+
+
+        CardDisplay cd = nextCard.GetComponent<CardDisplay>();
+        cd.TurnCard(0.5f);
+        
+        
+        /*
+        LeanTween.value(nextCard, a =>
+        {
+            nextCardRect.sizeDelta = new Vector2(a, a*aspect);
+
+        }, xyStart.x, xyEnd.x, 1f).setEase(LeanTweenType.easeInOutQuad);
+        */
+        
+        nextCard.transform.SetAsLastSibling();
+        nextCard = newNextCard;
+    }
+
+    private GameObject SpawnCard(GameObject cardToSpawn)
+    {
+        GameObject newNextCard = Instantiate(cardToSpawn, 
+            nextCardPos.transform.position, 
+            nextCardPos.transform.rotation,
+            nextCardPos.transform.parent);
+
+        CardDisplay cd = newNextCard.GetComponent<CardDisplay>();
+        cd.SetCardActive(false);
+        cd.Initialize();
+            
+        RectTransform nCardRect = newNextCard.GetComponent<RectTransform>();
+        RectTransform currentCardRect = nextCardPos.GetComponent<RectTransform>();
+            
+        nCardRect.anchorMin = currentCardRect.anchorMin;
+        nCardRect.anchorMax = currentCardRect.anchorMax;
+        nCardRect.anchoredPosition = currentCardRect.anchoredPosition;
+        nCardRect.sizeDelta = currentCardRect.sizeDelta;
+            
+        newNextCard.transform.SetAsFirstSibling();
+
+        return newNextCard;
+    }
+
+    private GameObject GetRandomCard()
+    {
+        int randomCardNumber = Random.Range(0, _cards.Count);
+
+        Card randomCard = _cards[randomCardNumber];
+        _cards.RemoveAt(randomCardNumber);
+
+        GameObject randomCardObj = MyResources.current.GetPlayingCard(randomCard.rank);
+        
+        randomCardObj.GetComponent<CardDisplay>().SetSuit(randomCard.suit);
+        //randomCardObj.GetComponent<CardDisplay>().suit = randomCard.suit;
+        
+        
+        Debug.Log($"Returning {randomCard.suit} {randomCard.rank}");
+        return randomCardObj;
+    }
+    
 
     private Dictionary<int,TextMeshProUGUI> GetCardCounters()
     {

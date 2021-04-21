@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 #if UNITY_EDITOR
@@ -11,14 +9,13 @@ using UnityEditor;
 
 public class CardDisplay : MonoBehaviour
 {
-    
-    private Suit _suit;
-    private int _currentSuit = 0;
-    
+    [SerializeField][HideInInspector] private Suit suit;
+
     //Card Rotation
     public GameObject cardBack;
     [HideInInspector] public bool isCardFacingDown;
     
+    //Card Elements
     public List<Image> suits;
     public List<TextMeshProUGUI> ranks;
     
@@ -26,38 +23,18 @@ public class CardDisplay : MonoBehaviour
     {
         FindCardElements(transform);
     }
-
-    private void Update()
-    {
-        /*if (Input.GetKeyDown(KeyCode.Space))
-        {
-            Suit s = (Suit) _currentSuit;
-            SetSuit(s);
-
-            _currentSuit++;
-
-            _currentSuit = _currentSuit == Enum.GetValues(typeof(Suit)).Length ? 0 : _currentSuit;
-        }
-        if (Input.GetKeyDown(KeyCode.D))
-        {
-            TurnCard();
-        }*/
-    }
+    
     
     /// <summary>
     /// Animated the card rotating 180 around it's y-axis
     /// </summary>
-    public void TurnCard()
+    public void TurnCard(float turnTime)
     {
         isCardFacingDown = !isCardFacingDown;
-        LeanTween.rotateLocal(gameObject, new Vector3(0, 90, 0), 0.5f).setEase(LeanTweenType.easeInQuad).setOnComplete(() =>
+        LeanTween.rotateLocal(gameObject, new Vector3(0, 90, 0), turnTime/2).setEase(LeanTweenType.easeInQuad).setOnComplete(() =>
         {
-            Debug.Log("Half way!");
             cardBack.SetActive(isCardFacingDown);
-            LeanTween.rotateLocal(gameObject, new Vector3(0, 0, 0), 0.5f).setEase(LeanTweenType.easeOutQuad).setOnComplete(() =>
-            {
-                Debug.Log("Done!");
-            });
+            LeanTween.rotateLocal(gameObject, new Vector3(0, 0, 0), turnTime / 2).setEase(LeanTweenType.easeOutQuad);
         });
     }
 
@@ -70,20 +47,33 @@ public class CardDisplay : MonoBehaviour
         isCardFacingDown = !cardActive;
         cardBack.SetActive(!cardActive);
     }
-    private void SetSuit(Suit s)
+    
+    /// <summary>
+    /// Changes the suit of the card and in turn, changes the rank color to match the suit
+    /// </summary>
+    /// <param name="s"></param>
+    public void Initialize()
     {
         foreach (Image image in suits)
         {
-            image.sprite = MyResources.current.GetSprite(s);
+            image.sprite = MyResources.current.GetSuitSprite(suit);
         }
         
         foreach (TextMeshProUGUI rank in ranks)
         {
-            rank.color = MyResources.current.GetSuitColor(s);
+            rank.color = MyResources.current.GetSuitColor(suit);
         }
-        
+    }
+
+    public void SetSuit(Suit suit)
+    {
+        this.suit = suit;
     }
     
+    /// <summary>
+    /// Iterates though the elements making up the card and saves elements marked with certain tags
+    /// </summary>
+    /// <param name="t"></param>
     public void FindCardElements(Transform t)
     {
         if (t.CompareTag("Suit"))
@@ -112,6 +102,9 @@ public class CardDisplay : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Empties the list of suits and ranks
+    /// </summary>
     public void CleanList()
     {
         suits.Clear();
@@ -119,6 +112,7 @@ public class CardDisplay : MonoBehaviour
     }
 }
 
+#region Custom Card Editor
 #if UNITY_EDITOR
 [CustomEditor(typeof(CardDisplay))]
 public class CardEditor : Editor
@@ -157,5 +151,6 @@ public class CardEditor : Editor
     }
 }
 #endif
+#endregion
 
 
