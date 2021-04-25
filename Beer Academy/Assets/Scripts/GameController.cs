@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Data_Types;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 using Random = UnityEngine.Random;
 
 
@@ -19,28 +20,52 @@ public class GameController : MonoBehaviour
     //UI
     private Dictionary<int,TextMeshProUGUI> _cardCounters;
     private readonly Dictionary<int, int> _cardCounterValues = new Dictionary<int, int>();
+    private TextMeshProUGUI _timerText;
     
     //Game Functionality
     private readonly List<Card> _cards = new List<Card>();
     private bool _gameOver;
     
+    //Timer
+    private bool _timerStarted = false;
+    private DateTime _startTime;
+
     private void Start()
     {
-        nextCardPos.SetActive(false);
+        //nextCardPos.SetActive(false);
         currentCardPos.SetActive(false);
         
         _cardCounters = GetCardCounters();
+        _timerText = GameObject.FindGameObjectWithTag("Timer").GetComponent<TextMeshProUGUI>();
         
         SetUp();
 
         nextCard = SpawnCard(GetRandomCard());
+        nextCardPos.SetActive(false);
     }
 
     // Update is called once per frame
     void Update()
     {
+        if(_timerStarted)
+        {
+            TimeSpan we = DateTime.Now - _startTime;
+
+            //string time = $"{timeElapsed.ToString("00")}";
+            
+            _timerText.text = $"{we.Hours:00}:{we.Minutes:00}:{we.Seconds:00}";
+        }
+        
+        
         if (Input.GetKeyDown(KeyCode.Space) && !_gameOver)
         {
+            if (!_timerStarted)
+            {
+                _startTime = DateTime.Now;
+                _timerStarted = true;
+            }
+            
+
             ShowNextCard();
         }
     }
@@ -55,12 +80,7 @@ public class GameController : MonoBehaviour
             }
         }
 
-        SetAllCounters(numberOfPlayers);
-        
-        foreach (Card card in _cards)
-        {
-            Debug.Log($"Rank: {card.rank} | Suit: {card.suit}");
-        }
+        SetAllCounters(numberOfPlayers); 
     }
 
     private void ShowNextCard()
@@ -104,6 +124,12 @@ public class GameController : MonoBehaviour
             nextCardPos.transform.rotation,
             nextCardPos.transform.parent);
 
+        AspectRatioFitter arf = nextCardPos.GetComponent<AspectRatioFitter>();
+        AspectRatioFitter arf1 = newNextCard.AddComponent<AspectRatioFitter>();
+
+        arf1.aspectMode = arf.aspectMode;
+        arf1.aspectRatio = arf.aspectRatio;
+        
         CardDisplay cd = newNextCard.GetComponent<CardDisplay>();
         cd.SetCardActive(false);
         cd.Initialize();

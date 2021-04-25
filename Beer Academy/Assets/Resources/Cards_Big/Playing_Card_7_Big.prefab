@@ -2525,6 +2525,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aa740989f2a0be44ea04317cb606748a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  suit: 1
+  rank: 7
   cardBack: {fileID: 0}
   isCardFacingDown: 0
   suits: []

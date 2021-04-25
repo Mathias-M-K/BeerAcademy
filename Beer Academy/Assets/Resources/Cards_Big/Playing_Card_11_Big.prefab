@@ -1307,7 +1307,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Q
+  m_text: J
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 0161d805a3764c089bef00bfe00793f5, type: 2}
   m_sharedMaterial: {fileID: 2147374, guid: 0161d805a3764c089bef00bfe00793f5, type: 2}
@@ -2359,7 +2359,7 @@ GameObject:
   - component: {fileID: 1632690613331949412}
   - component: {fileID: 1632690613331949414}
   m_Layer: 5
-  m_Name: Playing_Card_J_Big
+  m_Name: Playing_Card_11_Big
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2436,6 +2436,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aa740989f2a0be44ea04317cb606748a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  suit: 4
+  rank: 11
   cardBack: {fileID: 0}
   isCardFacingDown: 0
   suits: []
@@ -2889,7 +2891,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Q
+  m_text: J
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 0161d805a3764c089bef00bfe00793f5, type: 2}
   m_sharedMaterial: {fileID: 2147374, guid: 0161d805a3764c089bef00bfe00793f5, type: 2}
