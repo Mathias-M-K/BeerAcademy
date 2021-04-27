@@ -3,13 +3,26 @@
     public class DataPoint
     {
         // Start is called before the first frame update
-        public float x;
-        public float y;
+        public readonly float round;
+        public readonly float numberOfSips;
+        public readonly float avgSip;
 
-        public DataPoint(float x, float y)
+        private readonly float[] _temps;
+        
+
+        public DataPoint(float round, float numberOfSips,float avgSip)
         {
-            this.x = x;
-            this.y = y;
+            this.round = round;
+            this.avgSip = avgSip;
+            this.numberOfSips = numberOfSips;
+            
+            _temps = new float[]{round,numberOfSips,avgSip};
+        }
+        
+        public float this[int index]
+        {
+            get => _temps[index];
+            set => _temps[index] = value;
         }
     }
 }
