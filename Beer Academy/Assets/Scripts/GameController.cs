@@ -10,7 +10,9 @@ using Random = UnityEngine.Random;
 public class GameController : MonoBehaviour
 {
     [Header("Game Settings")] 
-    public int numberOfPlayers;
+    public List<string> playerNames;
+    private readonly List<Player> _players = new List<Player>();
+    private int _currentPlayer = 0;
     
     [Header("Card Flipping Elements")]
     public GameObject currentCardPos;
@@ -21,7 +23,8 @@ public class GameController : MonoBehaviour
     private Dictionary<int,TextMeshProUGUI> _cardCounters;
     private readonly Dictionary<int, int> _cardCounterValues = new Dictionary<int, int>();
     private TextMeshProUGUI _timerText;
-    
+    private TextMeshProUGUI _currentPlayerName;
+
     //Game Functionality
     private readonly List<Card> _cards = new List<Card>();
     private bool _gameOver;
@@ -37,11 +40,25 @@ public class GameController : MonoBehaviour
         
         _cardCounters = GetCardCounters();
         _timerText = GameObject.FindGameObjectWithTag("Timer").GetComponent<TextMeshProUGUI>();
+        _currentPlayerName = GameObject.FindGameObjectWithTag("CurrentPlayerName").GetComponent<TextMeshProUGUI>();
+        
+        CreatePlayerList();
         
         SetUp();
-
+        
         nextCard = SpawnCard(GetRandomCard());
         nextCardPos.SetActive(false);
+    }
+
+    private void CreatePlayerList()
+    {
+        //TODO This method should be deleted at some point
+        int id = 0;
+        foreach (string playerName in playerNames)
+        {
+            _players.Add(new Player(id,playerName,MyResources.current.GetColor(id)));
+            id++;
+        }
     }
 
     // Update is called once per frame
@@ -50,8 +67,6 @@ public class GameController : MonoBehaviour
         if(_timerStarted)
         {
             TimeSpan we = DateTime.Now - _startTime;
-
-            //string time = $"{timeElapsed.ToString("00")}";
             
             _timerText.text = $"{we.Hours:00}:{we.Minutes:00}:{we.Seconds:00}";
         }
@@ -74,13 +89,23 @@ public class GameController : MonoBehaviour
     {
         for (int i = 2; i <= 14; i++)
         {
-            for (int y = 0; y < numberOfPlayers; y++)
+            for (int y = 0; y < _players.Count; y++)
             {
                 _cards.Add(new Card(i, (Suit)y));
             }
         }
 
-        SetAllCounters(numberOfPlayers); 
+        SetAllCounters(_players.Count); 
+    }
+
+    private Player GetNextPlayer()
+    {
+        Player currentPlayer = _players[_currentPlayer];
+        _currentPlayer++;
+
+        if (_currentPlayer >= _players.Count) _currentPlayer = 0;
+
+        return currentPlayer;
     }
 
     private void ShowNextCard()
@@ -94,25 +119,16 @@ public class GameController : MonoBehaviour
         {
             _gameOver = true;
         }
-        
+
+        _currentPlayerName.text = GetNextPlayer().name;
 
         LeanTween.move(nextCard, currentCardPos.transform.position, 0.5f).setEase(LeanTweenType.easeInOutQuad);
-
 
         CardDisplay cd = nextCard.GetComponent<CardDisplay>();
         cd.TurnCard(0.5f);
 
         SubtractOneFromCounter(cd.GetRank());
-        
-        
-        /*
-        LeanTween.value(nextCard, a =>
-        {
-            nextCardRect.sizeDelta = new Vector2(a, a*aspect);
 
-        }, xyStart.x, xyEnd.x, 1f).setEase(LeanTweenType.easeInOutQuad);
-        */
-        
         nextCard.transform.SetAsLastSibling();
         nextCard = newNextCard;
     }

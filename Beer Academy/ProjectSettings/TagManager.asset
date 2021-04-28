@@ -9,6 +9,7 @@ TagManager:
   - CardCounter
   - CardBack
   - Timer
+  - CurrentPlayerName
   layers:
   - Default
   - TransparentFX

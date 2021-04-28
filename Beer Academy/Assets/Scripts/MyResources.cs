@@ -23,6 +23,8 @@ public class MyResources : MonoBehaviour
     private readonly Dictionary<Suit, Sprite> _suits = new Dictionary<Suit, Sprite>();
     private readonly Dictionary<Suit, Color> _suitColors = new Dictionary<Suit, Color>();
     private Dictionary<int, GameObject> _cards = new Dictionary<int, GameObject>();
+
+    public List<Color32> playerColors;
     
     /// <summary>
     /// Method for fetching resources from the resources folder and making them accessible globally.
@@ -88,13 +90,15 @@ public class MyResources : MonoBehaviour
     }
 
     /// <summary>
-    /// //Returns all playing cards in a dictionary, where the key is the card number (eg. 2 will return playing card two, and 11 will return the jack)
+    /// Returns a color based in the id
     /// </summary>
+    /// <param name="id"></param>
     /// <returns></returns>
-    public Dictionary<int,GameObject> GetAllPlayingCards()
+    public Color32 GetColor(int id)
     {
-        return _cards;
+        return playerColors[id];
     }
+    
 
     /// <summary>
     /// Returns the general color of the suit

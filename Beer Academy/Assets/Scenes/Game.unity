@@ -8369,7 +8369,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 383893965712a314b85e3b0709601a5e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  numberOfPlayers: 2
+  playerNames:
+  - Mathias
+  - Frederik
   currentCardPos: {fileID: 397065611}
   nextCardPos: {fileID: 1973771239}
   nextCard: {fileID: 0}
@@ -9096,6 +9098,27 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 07ae559cc8b0fa64baf9ffe5eedc4a18, type: 3}
+--- !u!1 &1073351784 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3180426420925099568, guid: d29dc93e87f83954d8417f5cad10d2d4,
+    type: 3}
+  m_PrefabInstance: {fileID: 2019453522}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1073351788
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1073351784}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 21577b679ce60014487a86b29ca4227b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  lineRenderer: {fileID: 0}
+  graphPoint: {fileID: 3114556012167403618, guid: 9819e83a5e49de9448f858b75a0e9105,
+    type: 3}
 --- !u!1 &1082354977 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1632690613331949410, guid: 30b18294ef8c3a8418fdd5a8e03ef3a9,
@@ -14296,7 +14319,7 @@ GameObject:
   - component: {fileID: 1752447874}
   m_Layer: 5
   m_Name: Text (TMP) (2)
-  m_TagString: Untagged
+  m_TagString: CurrentPlayerName
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -15714,7 +15737,7 @@ PrefabInstance:
     - target: {fileID: 3180426420185883737, guid: d29dc93e87f83954d8417f5cad10d2d4,
         type: 3}
       propertyPath: m_text
-      value: 150
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3180426420185883737, guid: d29dc93e87f83954d8417f5cad10d2d4,
         type: 3}
@@ -15774,7 +15797,7 @@ PrefabInstance:
     - target: {fileID: 3180426420454226052, guid: d29dc93e87f83954d8417f5cad10d2d4,
         type: 3}
       propertyPath: m_text
-      value: 150
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3180426420454226052, guid: d29dc93e87f83954d8417f5cad10d2d4,
         type: 3}
@@ -15794,7 +15817,7 @@ PrefabInstance:
     - target: {fileID: 3180426420454226053, guid: d29dc93e87f83954d8417f5cad10d2d4,
         type: 3}
       propertyPath: m_SizeDelta.x
-      value: 32.712967
+      value: 28.66329
       objectReference: {fileID: 0}
     - target: {fileID: 3180426420454226053, guid: d29dc93e87f83954d8417f5cad10d2d4,
         type: 3}
@@ -15875,6 +15898,16 @@ PrefabInstance:
         type: 3}
     - target: {fileID: 3180426420991409254, guid: d29dc93e87f83954d8417f5cad10d2d4,
         type: 3}
+      propertyPath: lineRenderers.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3180426420991409254, guid: d29dc93e87f83954d8417f5cad10d2d4,
+        type: 3}
+      propertyPath: lineRenderers.Array.data[0]
+      value: 
+      objectReference: {fileID: 1073351788}
+    - target: {fileID: 3180426420991409254, guid: d29dc93e87f83954d8417f5cad10d2d4,
+        type: 3}
       propertyPath: verticalSeparatorStepIncrement
       value: 10
       objectReference: {fileID: 0}
@@ -15940,6 +15973,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3180426421338959376, guid: d29dc93e87f83954d8417f5cad10d2d4,
         type: 3}
+      propertyPath: m_text
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3180426421338959376, guid: d29dc93e87f83954d8417f5cad10d2d4,
+        type: 3}
       propertyPath: m_fontSize
       value: 13
       objectReference: {fileID: 0}
@@ -15981,7 +16019,7 @@ PrefabInstance:
     - target: {fileID: 3180426421556066583, guid: d29dc93e87f83954d8417f5cad10d2d4,
         type: 3}
       propertyPath: m_text
-      value: 150
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3180426421556066583, guid: d29dc93e87f83954d8417f5cad10d2d4,
         type: 3}
