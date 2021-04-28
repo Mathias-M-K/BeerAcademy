@@ -16,4 +16,9 @@ public class LineRendererController : MonoBehaviour
     {
         lineRenderer = GetComponent<UILineRenderer>();
     }
+
+    public void SetColor(Color32 color)
+    {
+        lineRenderer.color = color;
+    }
 }

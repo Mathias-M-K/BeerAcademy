@@ -5,7 +5,7 @@ public class Player
     public int id;
     public string name;
     public Color32 color;
-    public int sips = 0;
+    public float sips = 0;
 
 
     public Player(int id, string name, Color32 color)

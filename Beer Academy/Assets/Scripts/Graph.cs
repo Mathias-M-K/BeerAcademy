@@ -5,6 +5,7 @@ using Data_Types;
 using TMPro;
 using UnityEngine;
 using UnityEngine.PlayerLoop;
+using UnityEngine.UI;
 using UnityEngine.UI.Extensions;
 using Random = UnityEngine.Random;
 #if UNITY_EDITOR
@@ -25,7 +26,7 @@ public class Graph : MonoBehaviour
     
     [Header("Template Objects")]    //Default objects and templates
     public GameObject graphPoint;
-    public List<LineRendererController> lineRenderers;
+    public LineRendererController lineRenderer;
     public List<GameObject> horizontalSeparators;
     public List<GameObject> verticalSeparators;
     public List<TextMeshProUGUI> horizontalSeparatorText;
@@ -49,8 +50,8 @@ public class Graph : MonoBehaviour
     private DataPoint _lastPoint = new DataPoint(0,0,0);
     public int dataPointFetchIndex = 1;    //if 1, the graph will display nrOfBeers, of 2, it will display avg beers
     private bool _graphReady;
-    //private Dictionary<Player,LineRendererController> lineRenderers
-
+    private Dictionary<Player, LineRendererController> _lineRenderers = new Dictionary<Player, LineRendererController>();
+    
     private float _highestAvgSip = 0;
     private float _highestSipCount = 0;
 
@@ -63,9 +64,17 @@ public class Graph : MonoBehaviour
     private int _roundCounter1 = 1,roundCounter2 = 1;
     private float _beerCounter1,_beerCounter2;
 
+    private Player _playerMathias;
+    private Player _playerFrederik;
+        
+    
+
     
     public void Start()
     {
+        //_playerMathias = new Player(1, "Mathias", MyResources.current.GetColor(1));
+        //_playerFrederik = new Player(2, "Frederik", MyResources.current.GetColor(2));
+        
         LeanTween.init(1600);
         StartCoroutine(InitiateGraph());
         _verticalSeparatorStepIncrementSaved = verticalSeparatorStepIncrement;
@@ -92,7 +101,7 @@ public class Graph : MonoBehaviour
             
             Debug.Log($"R -- Round:{_roundCounter1} | BeerCounter:{_beerCounter1} | AvgSips:{avgBeers}");
             
-            AddPointImage(new DataPoint(_roundCounter1,_beerCounter1,avgBeers),lineRenderers[0].GetComponent<LineRendererController>());
+            AddDataPoint(new DataPoint(_roundCounter1,_beerCounter1,avgBeers),_playerMathias);
 
             _roundCounter1++;
         }
@@ -114,7 +123,7 @@ public class Graph : MonoBehaviour
             
             Debug.Log($"T -- Round:{roundCounter2} | BeerCounter:{_beerCounter2} | AvgSips:{avgBeers}");
             
-            AddPointImage(new DataPoint(roundCounter2,_beerCounter2,avgBeers),lineRenderers[1].GetComponent<LineRendererController>());
+            AddDataPoint(new DataPoint(roundCounter2,_beerCounter2,avgBeers),_playerFrederik);
 
             roundCounter2++;
         }
@@ -127,7 +136,7 @@ public class Graph : MonoBehaviour
     private IEnumerator InitiateGraph()
     {
         //Apparently, i can't call this code right away without it returning incorrect numbers, so i gotta wait two seconds
-        yield return new WaitForSeconds(2);
+        yield return new WaitForSeconds(0.2f);
 
         //Getting height and width from graph rect
         Rect graphXY = graphOverlay.rect;
@@ -140,18 +149,26 @@ public class Graph : MonoBehaviour
         
         _graphReady = true;
         
-        AddPointImage(new DataPoint(0,0,0),lineRenderers[0]);
+        //Getting players from the game controller
+        foreach (Player player in GameController.current.GetAllPlayers())
+        {
+            AddNewPlayer(player);
+        }
+        
+        //AddDataPoint(new DataPoint(0,0,0),_lineRenderers[0]);
+        //AddNewPlayer(_playerMathias);
+        //AddNewPlayer(_playerFrederik);
     }
 
     public void AddNewPlayer(Player player)
     {
-        GameObject newLineRenderer = Instantiate(lineRenderers[0].gameObject, 
+        GameObject newLineRenderer = Instantiate(lineRenderer.gameObject, 
             new Vector3(0, 0, 0), 
             Quaternion.Euler(0, 0, 0),
-            lineRenderers[0].transform.parent);
+            lineRenderer.transform.parent);
 
         RectTransform newLineRendererRect = newLineRenderer.GetComponent<RectTransform>();
-        RectTransform originalLineRendererRect = lineRenderers[0].GetComponent<RectTransform>();
+        RectTransform originalLineRendererRect = lineRenderer.GetComponent<RectTransform>();
 
         newLineRendererRect.sizeDelta = originalLineRendererRect.sizeDelta;
         newLineRendererRect.anchoredPosition = originalLineRendererRect.anchoredPosition;
@@ -162,40 +179,43 @@ public class Graph : MonoBehaviour
 
 
         LineRendererController nlrc = nlr.GetComponent<LineRendererController>();
+        nlrc.SetColor(player.color);
         
-        AddPointImage(new DataPoint(0,0,0),nlrc);
-        lineRenderers.Add(nlrc.GetComponent<LineRendererController>());
+        _lineRenderers.Add(player,nlrc);
+        AddDataPoint(new DataPoint(0,0,0),player);
+        //_lineRenderers.Add(player,nlrc);
     } 
     
     /// <summary>
     /// Adds a new point on the graph using x and y. Coordinates should correspond to the graph
     /// </summary>
     /// <param name="point"></param>
-    public void AddPointImage(DataPoint point,LineRendererController lrc)
+    public void AddDataPoint(DataPoint point, Player player)
     {
         if(!_graphReady) return;
-        
+
         //Checking if new point is setting any new max values
         if (point.avgSip > _highestAvgSip) _highestAvgSip = point.avgSip;
         if (point.numberOfSips > _highestSipCount) _highestSipCount = point.numberOfSips;
         
         //The spawn position is not it's final position. This is merely the position it waits, before being animated to its final position.
-        Vector2 pointSpawnPos = GetGraphPosition(new Vector2(lrc.lastPoint[0],lrc.lastPoint[dataPointFetchIndex]));
+        Vector2 pointSpawnPos = GetGraphPosition(new Vector2(_lineRenderers[player].lastPoint[0],_lineRenderers[player].lastPoint[dataPointFetchIndex]));
         
         //Creating the new point and placing it at the spawn position
         GameObject go = Instantiate(graphPoint, new Vector3(0,0,0), Quaternion.Euler(0, 0, 0), horizontalSeparators[0].transform.parent);
         go.GetComponent<RectTransform>().localPosition = pointSpawnPos;
+        go.GetComponent<Image>().color = player.color;
         
         //Adding the new point to our the required list and dictionaries 
-        lrc._graphPoints.Add(go,point);
-        AddPointToLineRenderer(new Vector2(pointSpawnPos.x,pointSpawnPos.y),lrc.lineRenderer);
+        _lineRenderers[player]._graphPoints.Add(go,point);
+        AddPointToLineRenderer(new Vector2(pointSpawnPos.x,pointSpawnPos.y),_lineRenderers[player].lineRenderer);
 
         //Updating _lastPoint with our new point
-        lrc.lastPoint = point;
+        _lineRenderers[player].lastPoint = point;
         
-        UpdatePointPositions(lrc);
+        UpdatePointPositions(_lineRenderers[player]);
         
-        lrc.transform.SetAsLastSibling();
+        _lineRenderers[player].transform.SetAsLastSibling();
         
         //If the graph it to limited to show the new point, we expand it till it fits 
         CheckAndExpandAxis(point);
@@ -378,9 +398,9 @@ public class Graph : MonoBehaviour
             i++;
         }
 
-        foreach (LineRendererController uiLineRenderer in lineRenderers)
+        foreach (KeyValuePair<Player,LineRendererController> uiLineRenderer in _lineRenderers)
         {
-            UpdatePointPositions(uiLineRenderer);
+            UpdatePointPositions(uiLineRenderer.Value);
         }
         
     }
@@ -452,9 +472,9 @@ public class Graph : MonoBehaviour
             i++;
         }
         
-        foreach (LineRendererController uiLineRenderer in lineRenderers)
+        foreach (KeyValuePair<Player,LineRendererController> uiLineRenderer in _lineRenderers)
         {
-            UpdatePointPositions(uiLineRenderer);
+            UpdatePointPositions(uiLineRenderer.Value);
         }
     }
 
@@ -469,9 +489,9 @@ public class Graph : MonoBehaviour
 
         UpdateVerticalSeparatorPositions();
 
-        foreach (LineRendererController lineRenderer in lineRenderers)
+        foreach (KeyValuePair<Player,LineRendererController> lineRenderer in _lineRenderers)
         {
-            UpdatePointPositions(lineRenderer);
+            UpdatePointPositions(lineRenderer.Value);
         }
     }
 
@@ -486,9 +506,9 @@ public class Graph : MonoBehaviour
         
         UpdateVerticalSeparatorPositions();
         
-        foreach (LineRendererController lineRenderer in lineRenderers)
+        foreach (KeyValuePair<Player,LineRendererController> lineRenderer in _lineRenderers)
         {
-            UpdatePointPositions(lineRenderer);
+            UpdatePointPositions(lineRenderer.Value);
         }
     }
 }
@@ -508,10 +528,6 @@ public class GraphEditor : Editor
         {
             graph.UpdateHorizontalSeparatorPositions();
             graph.UpdateVerticalSeparatorPositions();
-        }
-        if (GUILayout.Button("Add Image"))
-        {
-            graph.AddPointImage(new DataPoint(graph.round,graph.beers,graph.avgTime),graph.lineRenderers[0].GetComponent<LineRendererController>());
         }
         if (GUILayout.Button("Add Player"))
         {

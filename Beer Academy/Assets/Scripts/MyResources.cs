@@ -82,11 +82,12 @@ public class MyResources : MonoBehaviour
     /// <summary>
     /// Returns a gameobject of a card
     /// </summary>
-    /// <param name="card"></param>
+    /// <param name="rank"></param>
     /// <returns></returns>
-    public GameObject GetPlayingCard(int card)
+    public GameObject GetPlayingCard(int rank)
     {
-        return _cards[card];
+        GameObject cardToReturn = _cards[rank];
+        return cardToReturn;
     }
 
     /// <summary>

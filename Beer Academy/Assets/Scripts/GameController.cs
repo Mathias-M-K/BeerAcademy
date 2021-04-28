@@ -9,6 +9,18 @@ using Random = UnityEngine.Random;
 
 public class GameController : MonoBehaviour
 {
+    public static GameController current;
+
+    private void Awake()
+    {
+        if (current == null)
+        {
+            current = this;
+        }
+        
+        CreatePlayerList();
+    }
+
     [Header("Game Settings")] 
     public List<string> playerNames;
     private readonly List<Player> _players = new List<Player>();
@@ -17,11 +29,12 @@ public class GameController : MonoBehaviour
     [Header("Card Flipping Elements")]
     public GameObject currentCardPos;
     public GameObject nextCardPos;
-    public GameObject nextCard;
+    public Card nextCard;
 
     //UI
     private Dictionary<int,TextMeshProUGUI> _cardCounters;
     private readonly Dictionary<int, int> _cardCounterValues = new Dictionary<int, int>();
+    private TextMeshProUGUI _roundCounterText;
     private TextMeshProUGUI _timerText;
     private TextMeshProUGUI _currentPlayerName;
 
@@ -32,6 +45,9 @@ public class GameController : MonoBehaviour
     //Timer
     private bool _timerStarted = false;
     private DateTime _startTime;
+    
+    //Counter 
+    private int _roundCounter = 1;
 
     private void Start()
     {
@@ -39,10 +55,9 @@ public class GameController : MonoBehaviour
         currentCardPos.SetActive(false);
         
         _cardCounters = GetCardCounters();
+        _roundCounterText = GameObject.FindGameObjectWithTag("RoundCounter").GetComponent<TextMeshProUGUI>();
         _timerText = GameObject.FindGameObjectWithTag("Timer").GetComponent<TextMeshProUGUI>();
         _currentPlayerName = GameObject.FindGameObjectWithTag("CurrentPlayerName").GetComponent<TextMeshProUGUI>();
-        
-        CreatePlayerList();
         
         SetUp();
         
@@ -91,26 +106,44 @@ public class GameController : MonoBehaviour
         {
             for (int y = 0; y < _players.Count; y++)
             {
-                _cards.Add(new Card(i, (Suit)y));
+                _cards.Add(new Card(i, (Suit)y,MyResources.current.GetPlayingCard(i)));
             }
         }
-
+        
         SetAllCounters(_players.Count); 
     }
 
+    /// <summary>
+    /// Returns next player in line, and progress the round if all players have drawn a card
+    /// </summary>
+    /// <returns>Next Player</returns>
     private Player GetNextPlayer()
     {
+        if (_currentPlayer >= _players.Count)
+        {
+            _currentPlayer = 0;
+            _roundCounter++;
+            _roundCounterText.text = $"Round:{_roundCounter}";
+        }
+        
         Player currentPlayer = _players[_currentPlayer];
         _currentPlayer++;
-
-        if (_currentPlayer >= _players.Count) _currentPlayer = 0;
 
         return currentPlayer;
     }
 
+    public List<Player> GetAllPlayers()
+    {
+        return _players;
+    }
+
     private void ShowNextCard()
     {
-        GameObject newNextCard = null;
+        if(_gameOver) return;
+
+        Player currentPlayer = GetNextPlayer();
+
+        Card newNextCard = null;
         if (_cards.Count > 0)
         {
             newNextCard = SpawnCard(GetRandomCard());
@@ -120,22 +153,28 @@ public class GameController : MonoBehaviour
             _gameOver = true;
         }
 
-        _currentPlayerName.text = GetNextPlayer().name;
+        currentPlayer.sips += nextCard.rank;
+            
+        Graph.current.AddDataPoint(new DataPoint(_roundCounter,currentPlayer.sips,currentPlayer.sips/_roundCounter),currentPlayer);
 
-        LeanTween.move(nextCard, currentCardPos.transform.position, 0.5f).setEase(LeanTweenType.easeInOutQuad);
+        _currentPlayerName.text = currentPlayer.name;
+        _currentPlayerName.color = currentPlayer.color;
 
-        CardDisplay cd = nextCard.GetComponent<CardDisplay>();
+        LeanTween.move(nextCard.cardObj, currentCardPos.transform.position, 0.5f).setEase(LeanTweenType.easeInOutQuad);
+
+        CardDisplay cd = nextCard.cardObj.GetComponent<CardDisplay>();
         cd.TurnCard(0.5f);
+        
 
         SubtractOneFromCounter(cd.GetRank());
 
-        nextCard.transform.SetAsLastSibling();
+        nextCard.cardObj.transform.SetAsLastSibling();
         nextCard = newNextCard;
     }
 
-    private GameObject SpawnCard(GameObject cardToSpawn)
+    private Card SpawnCard(Card cardToSpawn)
     {
-        GameObject newNextCard = Instantiate(cardToSpawn, 
+        GameObject newNextCard = Instantiate(cardToSpawn.cardObj, 
             nextCardPos.transform.position, 
             nextCardPos.transform.rotation,
             nextCardPos.transform.parent);
@@ -159,11 +198,13 @@ public class GameController : MonoBehaviour
         nCardRect.sizeDelta = currentCardRect.sizeDelta;
             
         newNextCard.transform.SetAsFirstSibling();
+
+        cardToSpawn.cardObj = newNextCard;
         
-        return newNextCard;
+        return cardToSpawn;
     }
 
-    private GameObject GetRandomCard()
+    /*private GameObject GetRandomCard()
     {
         int randomCardNumber = Random.Range(0, _cards.Count);
 
@@ -179,6 +220,21 @@ public class GameController : MonoBehaviour
         
         Debug.Log($"Returning {randomCard.suit} {randomCard.rank}");
         return randomCardObj;
+    }*/
+    private Card GetRandomCard()
+    {
+        int randomCardNumber = Random.Range(0, _cards.Count);
+
+        Card randomCard = _cards[randomCardNumber];
+        _cards.RemoveAt(randomCardNumber);
+
+        CardDisplay randomCardDisplay = randomCard.cardObj.GetComponent<CardDisplay>();
+        randomCardDisplay.SetSuit(randomCard.suit);
+        randomCardDisplay.SetRank(randomCard.rank);
+        //randomCardObj.GetComponent<CardDisplay>().suit = randomCard.suit;
+        
+        Debug.Log($"Returning {randomCard.suit} {randomCard.rank}");
+        return randomCard;
     }
     
 

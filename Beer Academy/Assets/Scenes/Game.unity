@@ -5711,7 +5711,7 @@ GameObject:
   - component: {fileID: 613486294}
   m_Layer: 5
   m_Name: Text (TMP) (1)
-  m_TagString: Untagged
+  m_TagString: RoundCounter
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -5754,7 +5754,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Round : 1'
+  m_text: 'Round : 0'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 125cb55b44b24c4393181402bc6200e6, type: 2}
   m_sharedMaterial: {fileID: 2100000, guid: 125cb55b44b24c4393181402bc6200e6, type: 2}
@@ -8113,6 +8113,31 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8334d812b46b26544ba2df5ff9f005d1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerColors:
+  - serializedVersion: 2
+    rgba: 4288461850
+  - serializedVersion: 2
+    rgba: 4292581428
+  - serializedVersion: 2
+    rgba: 4284369204
+  - serializedVersion: 2
+    rgba: 4279223537
+  - serializedVersion: 2
+    rgba: 4282141927
+  - serializedVersion: 2
+    rgba: 4291281853
+  - serializedVersion: 2
+    rgba: 4290140571
+  - serializedVersion: 2
+    rgba: 4292859518
+  - serializedVersion: 2
+    rgba: 4285215536
+  - serializedVersion: 2
+    rgba: 4294926205
+  - serializedVersion: 2
+    rgba: 4284899840
+  - serializedVersion: 2
+    rgba: 4282203453
 --- !u!212 &1005380606
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -8372,9 +8397,10 @@ MonoBehaviour:
   playerNames:
   - Mathias
   - Frederik
+  - Lasse
+  - Andreas
   currentCardPos: {fileID: 397065611}
   nextCardPos: {fileID: 1973771239}
-  nextCard: {fileID: 0}
 --- !u!1001 &1038180301
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -14362,7 +14388,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Mathias Mundt Kofod
+  m_text: Min nabo torben
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 125cb55b44b24c4393181402bc6200e6, type: 2}
   m_sharedMaterial: {fileID: 2100000, guid: 125cb55b44b24c4393181402bc6200e6, type: 2}
@@ -15896,6 +15922,11 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 3114556012167403618, guid: 9819e83a5e49de9448f858b75a0e9105,
         type: 3}
+    - target: {fileID: 3180426420991409254, guid: d29dc93e87f83954d8417f5cad10d2d4,
+        type: 3}
+      propertyPath: lineRenderer
+      value: 
+      objectReference: {fileID: 1073351788}
     - target: {fileID: 3180426420991409254, guid: d29dc93e87f83954d8417f5cad10d2d4,
         type: 3}
       propertyPath: lineRenderers.Array.size

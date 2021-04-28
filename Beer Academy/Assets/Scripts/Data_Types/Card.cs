@@ -7,13 +7,14 @@ namespace Data_Types
     {
         public readonly int rank;
         public readonly Suit suit;
+        public GameObject cardObj;
 
 
-        public Card(int rank, Suit suit)
+        public Card(int rank, Suit suit, GameObject cardObj)
         {
             this.rank = rank;
             this.suit = suit;
-
+            this.cardObj = cardObj;
         }
     }
 }
