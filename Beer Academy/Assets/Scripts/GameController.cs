@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Data_Types;
+using Debugging;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -30,6 +31,9 @@ public class GameController : MonoBehaviour
     public GameObject currentCardPos;
     public GameObject nextCardPos;
     public Card nextCard;
+
+    [Header("Other")] 
+    public DebugPanelController debugPanelController;
 
     //UI
     private Dictionary<int,TextMeshProUGUI> _cardCounters;
@@ -79,6 +83,17 @@ public class GameController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            Application.Quit();
+        }
+
+        if (Input.GetKey(KeyCode.LeftControl) && Input.GetKeyDown(KeyCode.D))
+        {
+            debugPanelController.Toggle();
+        }
+        
+        
         if(_timerStarted)
         {
             TimeSpan we = DateTime.Now - _startTime;
@@ -94,7 +109,6 @@ public class GameController : MonoBehaviour
                 _startTime = DateTime.Now;
                 _timerStarted = true;
             }
-            
 
             ShowNextCard();
         }
@@ -123,8 +137,9 @@ public class GameController : MonoBehaviour
         {
             _currentPlayer = 0;
             _roundCounter++;
-            _roundCounterText.text = $"Round:{_roundCounter}";
+            DataGrid.current.AddRow(_roundCounter);
         }
+        _roundCounterText.text = $"Round:{_roundCounter}";
         
         Player currentPlayer = _players[_currentPlayer];
         _currentPlayer++;
@@ -156,6 +171,7 @@ public class GameController : MonoBehaviour
         currentPlayer.sips += nextCard.rank;
             
         Graph.current.AddDataPoint(new DataPoint(_roundCounter,currentPlayer.sips,currentPlayer.sips/_roundCounter),currentPlayer);
+        DataGrid.current.SetFieldValue(currentPlayer,nextCard.rank);
 
         _currentPlayerName.text = currentPlayer.name;
         _currentPlayerName.color = currentPlayer.color;
@@ -231,9 +247,7 @@ public class GameController : MonoBehaviour
         CardDisplay randomCardDisplay = randomCard.cardObj.GetComponent<CardDisplay>();
         randomCardDisplay.SetSuit(randomCard.suit);
         randomCardDisplay.SetRank(randomCard.rank);
-        //randomCardObj.GetComponent<CardDisplay>().suit = randomCard.suit;
-        
-        Debug.Log($"Returning {randomCard.suit} {randomCard.rank}");
+
         return randomCard;
     }
     

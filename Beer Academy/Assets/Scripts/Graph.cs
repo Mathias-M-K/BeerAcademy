@@ -39,6 +39,9 @@ public class Graph : MonoBehaviour
     public float horizontalSeparatorWidth;
     public float verticalSeparatorWidth;
     public int verticalSeparatorStepIncrement;
+
+    [Header("Animation Settings")] 
+    public float animationSpeed = 0.75f;
     private int _verticalSeparatorStepIncrementSaved;    //Saved value
 
     private float _widthOfGraph;
@@ -48,7 +51,7 @@ public class Graph : MonoBehaviour
     
     //Other
     private DataPoint _lastPoint = new DataPoint(0,0,0);
-    public int dataPointFetchIndex = 1;    //if 1, the graph will display nrOfBeers, of 2, it will display avg beers
+    private int _dataPointFetchIndex = 1;    //if 1, the graph will display nrOfBeers, of 2, it will display avg beers
     private bool _graphReady;
     private Dictionary<Player, LineRendererController> _lineRenderers = new Dictionary<Player, LineRendererController>();
     
@@ -199,7 +202,7 @@ public class Graph : MonoBehaviour
         if (point.numberOfSips > _highestSipCount) _highestSipCount = point.numberOfSips;
         
         //The spawn position is not it's final position. This is merely the position it waits, before being animated to its final position.
-        Vector2 pointSpawnPos = GetGraphPosition(new Vector2(_lineRenderers[player].lastPoint[0],_lineRenderers[player].lastPoint[dataPointFetchIndex]));
+        Vector2 pointSpawnPos = GetGraphPosition(new Vector2(_lineRenderers[player].lastPoint[0],_lineRenderers[player].lastPoint[_dataPointFetchIndex]));
         
         //Creating the new point and placing it at the spawn position
         GameObject go = Instantiate(graphPoint, new Vector3(0,0,0), Quaternion.Euler(0, 0, 0), horizontalSeparators[0].transform.parent);
@@ -236,9 +239,9 @@ public class Graph : MonoBehaviour
                 AddHorizontalSeparator();
             }
         }
-        if (point[dataPointFetchIndex] > _maxVerticalValue)
+        if (point[_dataPointFetchIndex] > _maxVerticalValue)
         {
-            float x = Mathf.Ceil((point[dataPointFetchIndex]-_maxVerticalValue)/verticalSeparatorStepIncrement);
+            float x = Mathf.Ceil((point[_dataPointFetchIndex]-_maxVerticalValue)/verticalSeparatorStepIncrement);
 
             for (int i = 0; i < x; i++)
             {
@@ -258,7 +261,7 @@ public class Graph : MonoBehaviour
         
         if(removeRedundantSeparators)
         {
-            float x = Mathf.Floor((_maxVerticalValue-point[dataPointFetchIndex])/verticalSeparatorStepIncrement);
+            float x = Mathf.Floor((_maxVerticalValue-point[_dataPointFetchIndex])/verticalSeparatorStepIncrement);
 
             if (x >= 1)
             {
@@ -283,7 +286,7 @@ public class Graph : MonoBehaviour
         foreach (KeyValuePair<GameObject,DataPoint> dataPoint in lrc._graphPoints)
         {
             int y = i;
-            LeanTween.moveLocal(dataPoint.Key, GetGraphPosition(new Vector2(dataPoint.Value[0],dataPoint.Value[dataPointFetchIndex])), 0.75f).setEase(LeanTweenType.easeInOutQuad).setOnUpdateVector3(vector3 =>
+            LeanTween.moveLocal(dataPoint.Key, GetGraphPosition(new Vector2(dataPoint.Value[0],dataPoint.Value[_dataPointFetchIndex])), animationSpeed).setEase(LeanTweenType.easeInOutQuad).setOnUpdateVector3(vector3 =>
             {
                 lrc.lineRenderer.Points[y] = new Vector2(vector3.x, vector3.y);
                 lrc.lineRenderer.SetAllDirty();
@@ -357,8 +360,8 @@ public class Graph : MonoBehaviour
         int lastSeparatorIndex = verticalSeparators.Count - 1;
         float deletePos = (_heightOfGraph / 2)+50;
         
-        LeanTween.moveLocalY(verticalSeparators[lastSeparatorIndex], deletePos, 0.75f).setEase(LeanTweenType.easeInOutQuad);
-        LeanTween.moveLocalY(verticalSeparatorText[lastSeparatorIndex].gameObject, deletePos, 0.75f).setEase(LeanTweenType.easeInOutQuad);
+        LeanTween.moveLocalY(verticalSeparators[lastSeparatorIndex], deletePos, animationSpeed).setEase(LeanTweenType.easeInOutQuad);
+        LeanTween.moveLocalY(verticalSeparatorText[lastSeparatorIndex].gameObject, deletePos, animationSpeed).setEase(LeanTweenType.easeInOutQuad);
         
         Destroy(verticalSeparators[lastSeparatorIndex],2);
         verticalSeparators.RemoveAt(verticalSeparators.Count-1);
@@ -383,11 +386,11 @@ public class Graph : MonoBehaviour
         int i = 0;
         foreach (GameObject separator in verticalSeparators)
         {
-            LeanTween.moveLocalY(separator, yPos, 0.75f).setEase(LeanTweenType.easeInOutQuad);
+            LeanTween.moveLocalY(separator, yPos, animationSpeed).setEase(LeanTweenType.easeInOutQuad);
 
             //Moves the text so it follows it's separator, and the text itself to reflect the graph correctly
             verticalSeparatorText[i].text = (i*verticalSeparatorStepIncrement).ToString();
-            LeanTween.moveLocalY(verticalSeparatorText[i].gameObject, yPos, 0.75f).setEase(LeanTweenType.easeInOutQuad);
+            LeanTween.moveLocalY(verticalSeparatorText[i].gameObject, yPos, animationSpeed).setEase(LeanTweenType.easeInOutQuad);
             
             //Updates yPos to reflect where the next separator should be
             yPos += increment;
@@ -457,11 +460,11 @@ public class Graph : MonoBehaviour
         int i = 0;
         foreach (GameObject separator in horizontalSeparators)
         {
-            LeanTween.moveLocalX(separator, xPos, 0.75f).setEase(LeanTweenType.easeInOutQuad);
+            LeanTween.moveLocalX(separator, xPos, animationSpeed).setEase(LeanTweenType.easeInOutQuad);
 
             //Moves the text so it follows it's separator, and the text itself to reflect the graph correctly
             horizontalSeparatorText[i].text = i.ToString();
-            LeanTween.moveLocalX(horizontalSeparatorText[i].gameObject, xPos,  0.75f).setEase(LeanTweenType.easeInOutQuad);
+            LeanTween.moveLocalX(horizontalSeparatorText[i].gameObject, xPos,  animationSpeed).setEase(LeanTweenType.easeInOutQuad);
             
             //Updates yPos to reflect where the next separator should be
             xPos += increment;
@@ -483,7 +486,7 @@ public class Graph : MonoBehaviour
         verticalSeparatorStepIncrement = 1;
         _maxVerticalValue = verticalSeparatorStepIncrement * (verticalSeparators.Count-1);
 
-        dataPointFetchIndex = 2;
+        _dataPointFetchIndex = 2;
 
         CheckAndExpandAxis(new DataPoint(0,0,_highestAvgSip),true);
 
@@ -500,7 +503,7 @@ public class Graph : MonoBehaviour
         verticalSeparatorStepIncrement = _verticalSeparatorStepIncrementSaved;
         _maxVerticalValue = verticalSeparatorStepIncrement * (verticalSeparators.Count-1);
         
-        dataPointFetchIndex = 1;
+        _dataPointFetchIndex = 1;
         
         CheckAndExpandAxis(new DataPoint(0,_highestSipCount,0),true);
         
