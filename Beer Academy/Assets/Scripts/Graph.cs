@@ -331,9 +331,22 @@ public class Graph : MonoBehaviour
         {
             LeanTween.moveLocalY(separator, yPos, animationSpeed).setEase(LeanTweenType.easeInOutQuad);
 
+            float textPos;
+            if (i == 0)
+            {
+                textPos = yPos + 10;
+            }else if (i == verticalSeparators.Count - 1)
+            {
+                textPos = yPos - 10;
+            }
+            else
+            {
+                textPos = yPos;
+            }
+
             //Moves the text so it follows it's separator, and the text itself to reflect the graph correctly
             verticalSeparatorText[i].text = (i*verticalSeparatorStepIncrement).ToString();
-            LeanTween.moveLocalY(verticalSeparatorText[i].gameObject, yPos, animationSpeed).setEase(LeanTweenType.easeInOutQuad);
+            LeanTween.moveLocalY(verticalSeparatorText[i].gameObject, textPos, animationSpeed).setEase(LeanTweenType.easeInOutQuad);
             
             //Updates yPos to reflect where the next separator should be
             yPos += increment;
@@ -403,10 +416,24 @@ public class Graph : MonoBehaviour
         foreach (GameObject separator in horizontalSeparators)
         {
             LeanTween.moveLocalX(separator, xPos, animationSpeed).setEase(LeanTweenType.easeInOutQuad);
+            
+            //Setting alignment
+            float textPos;
+            if (i == 0)
+            {
+                textPos = xPos + 10;
+            }else if (i == horizontalSeparators.Count - 1)
+            {
+                textPos = xPos - 10;
+            }
+            else
+            {
+                textPos = xPos;
+            }
 
             //Moves the text so it follows it's separator, and the text itself to reflect the graph correctly
             horizontalSeparatorText[i].text = i.ToString();
-            LeanTween.moveLocalX(horizontalSeparatorText[i].gameObject, xPos,  animationSpeed).setEase(LeanTweenType.easeInOutQuad);
+            LeanTween.moveLocalX(horizontalSeparatorText[i].gameObject, textPos,  animationSpeed).setEase(LeanTweenType.easeInOutQuad);
             
             //Updates yPos to reflect where the next separator should be
             xPos += increment;
