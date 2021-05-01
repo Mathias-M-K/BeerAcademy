@@ -137,7 +137,7 @@ public class GameController : MonoBehaviour
         {
             _currentPlayer = 0;
             _roundCounter++;
-            DataGrid.current.AddRow(_roundCounter);
+            Table.current.AddRow(_roundCounter);
         }
         _roundCounterText.text = $"Round:{_roundCounter}";
         
@@ -171,7 +171,7 @@ public class GameController : MonoBehaviour
         currentPlayer.sips += nextCard.rank;
             
         Graph.current.AddDataPoint(new DataPoint(_roundCounter,currentPlayer.sips,currentPlayer.sips/_roundCounter),currentPlayer);
-        DataGrid.current.SetFieldValue(currentPlayer,nextCard.rank);
+        Table.current.SetFieldValue(currentPlayer,nextCard.rank);
 
         _currentPlayerName.text = currentPlayer.name;
         _currentPlayerName.color = currentPlayer.color;

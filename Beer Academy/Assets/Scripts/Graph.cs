@@ -50,96 +50,32 @@ public class Graph : MonoBehaviour
     private int _maxHorizontalValue;    //The current maximum horizontal value on x-axis    
     
     //Other
-    private DataPoint _lastPoint = new DataPoint(0,0,0);
     private int _dataPointFetchIndex = 1;    //if 1, the graph will display nrOfBeers, of 2, it will display avg beers
-    private bool _graphReady;
-    private Dictionary<Player, LineRendererController> _lineRenderers = new Dictionary<Player, LineRendererController>();
+
+    private readonly Dictionary<Player, LineRendererController> _lineRenderers = new Dictionary<Player, LineRendererController>();
     
-    private float _highestAvgSip = 0;
-    private float _highestSipCount = 0;
-
-    [Header("Manual Input")]
-    public float round;
-    public float beers;
-    public float avgTime;
-
+    private float _highestAvgSip = 0.01f;
+    private float _highestSipCount = 0.01f;
     
-    private int _roundCounter1 = 1,roundCounter2 = 1;
-    private float _beerCounter1,_beerCounter2;
-
-    private Player _playerMathias;
-    private Player _playerFrederik;
-        
-    
-
     
     public void Start()
     {
-        //_playerMathias = new Player(1, "Mathias", MyResources.current.GetColor(1));
-        //_playerFrederik = new Player(2, "Frederik", MyResources.current.GetColor(2));
-        
+        //Because i need to do a lot of animations, i have to initiate it
         LeanTween.init(1600);
+        
         StartCoroutine(InitiateGraph());
         _verticalSeparatorStepIncrementSaved = verticalSeparatorStepIncrement;
     }
     
-    public void Update()
-    {
-        //TODO remove this. I only wrote this to make it easy to test
-        if (Input.GetKeyDown(KeyCode.R) && _graphReady)
-        {
-            float randomNumber = Random.Range(2, 14);
-
-            _beerCounter1 += randomNumber;
-            float avgBeers;
-            
-            if (_roundCounter1 != 0)
-            {
-                avgBeers  = _beerCounter1 / _roundCounter1;
-            }
-            else
-            {
-                avgBeers = 0;
-            }
-            
-            Debug.Log($"R -- Round:{_roundCounter1} | BeerCounter:{_beerCounter1} | AvgSips:{avgBeers}");
-            
-            AddDataPoint(new DataPoint(_roundCounter1,_beerCounter1,avgBeers),_playerMathias);
-
-            _roundCounter1++;
-        }
-        if (Input.GetKeyDown(KeyCode.T) && _graphReady)
-        {
-            float randomNumber = Random.Range(2, 14);
-
-            _beerCounter2 += randomNumber;
-            float avgBeers;
-            
-            if (roundCounter2 != 0)
-            {
-                avgBeers  = _beerCounter2 / roundCounter2;
-            }
-            else
-            {
-                avgBeers = 0;
-            }
-            
-            Debug.Log($"T -- Round:{roundCounter2} | BeerCounter:{_beerCounter2} | AvgSips:{avgBeers}");
-            
-            AddDataPoint(new DataPoint(roundCounter2,_beerCounter2,avgBeers),_playerFrederik);
-
-            roundCounter2++;
-        }
-    }
     
     /// <summary>
-    /// Initiates the graph with the default separators and the height and width of the graph in the current screen aspect ratio
+    /// Initiates the graph with the default separators and the height and width of the graph in the current screen aspect ratio.
+    /// The method waits until it can fetch the dimensions of the graph box, since these dimensions are critical for the rest of the code.
     /// </summary>
     /// <returns></returns>
     private IEnumerator InitiateGraph()
     {
-        //Apparently, i can't call this code right away without it returning incorrect numbers, so i gotta wait two seconds
-        yield return new WaitForSeconds(0.2f);
+        yield return new WaitUntil(() => graphOverlay.sizeDelta.x > 0);
 
         //Getting height and width from graph rect
         Rect graphXY = graphOverlay.rect;
@@ -150,7 +86,7 @@ public class Graph : MonoBehaviour
         UpdateHorizontalSeparatorPositions();
         UpdateVerticalSeparatorPositions();
         
-        _graphReady = true;
+
         
         //Getting players from the game controller
         foreach (Player player in GameController.current.GetAllPlayers())
@@ -158,45 +94,46 @@ public class Graph : MonoBehaviour
             AddNewPlayer(player);
         }
         
-        //AddDataPoint(new DataPoint(0,0,0),_lineRenderers[0]);
-        //AddNewPlayer(_playerMathias);
-        //AddNewPlayer(_playerFrederik);
+        Destroy(lineRenderer.gameObject);
     }
 
+    /// <summary>
+    /// Adds a new line-renderer for each player to show their individual stats.
+    /// </summary>
+    /// <param name="player"></param>
     public void AddNewPlayer(Player player)
     {
-        GameObject newLineRenderer = Instantiate(lineRenderer.gameObject, 
+        GameObject newLineRendererObj = Instantiate(lineRenderer.gameObject, 
             new Vector3(0, 0, 0), 
             Quaternion.Euler(0, 0, 0),
             lineRenderer.transform.parent);
 
-        RectTransform newLineRendererRect = newLineRenderer.GetComponent<RectTransform>();
+        RectTransform newLineRendererRect = newLineRendererObj.GetComponent<RectTransform>();
         RectTransform originalLineRendererRect = lineRenderer.GetComponent<RectTransform>();
 
         newLineRendererRect.sizeDelta = originalLineRendererRect.sizeDelta;
         newLineRendererRect.anchoredPosition = originalLineRendererRect.anchoredPosition;
 
         //If there is any points in the lineRenderer, they are removed
-        UILineRenderer nlr = newLineRenderer.GetComponent<UILineRenderer>();
-        nlr.Points = new List<Vector2>().ToArray();
-
-
-        LineRendererController nlrc = nlr.GetComponent<LineRendererController>();
-        nlrc.SetColor(player.color);
+        UILineRenderer newLineRenderer = newLineRendererObj.GetComponent<UILineRenderer>();
+        newLineRenderer.Points = new List<Vector2>().ToArray();
         
-        _lineRenderers.Add(player,nlrc);
+        //Setting color of the line renderer
+        LineRendererController newLineRendererController = newLineRenderer.GetComponent<LineRendererController>();
+        newLineRendererController.SetColor(player.color);
+        
+        _lineRenderers.Add(player,newLineRendererController);
+        
         AddDataPoint(new DataPoint(0,0,0),player);
-        //_lineRenderers.Add(player,nlrc);
-    } 
-    
+    }
+
     /// <summary>
     /// Adds a new point on the graph using x and y. Coordinates should correspond to the graph
     /// </summary>
     /// <param name="point"></param>
+    /// <param name="player"></param>
     public void AddDataPoint(DataPoint point, Player player)
     {
-        if(!_graphReady) return;
-
         //Checking if new point is setting any new max values
         if (point.avgSip > _highestAvgSip) _highestAvgSip = point.avgSip;
         if (point.numberOfSips > _highestSipCount) _highestSipCount = point.numberOfSips;
@@ -210,7 +147,7 @@ public class Graph : MonoBehaviour
         go.GetComponent<Image>().color = player.color;
         
         //Adding the new point to our the required list and dictionaries 
-        _lineRenderers[player]._graphPoints.Add(go,point);
+        _lineRenderers[player].graphPoints.Add(go,point);
         AddPointToLineRenderer(new Vector2(pointSpawnPos.x,pointSpawnPos.y),_lineRenderers[player].lineRenderer);
 
         //Updating _lastPoint with our new point
@@ -230,6 +167,7 @@ public class Graph : MonoBehaviour
     /// <param name="point"></param>
     private void CheckAndExpandAxis(DataPoint point)
     {
+        //Checks if the round number is represented on the horizontal axis. If not, the graph will be expanded horizontally
         if (point.round > _maxHorizontalValue)
         {
             float x = (point.round - _maxHorizontalValue);
@@ -239,6 +177,8 @@ public class Graph : MonoBehaviour
                 AddHorizontalSeparator();
             }
         }
+        
+        //Checks if the value is represented on the vertical axis. If now, the graph will be expanded vertically
         if (point[_dataPointFetchIndex] > _maxVerticalValue)
         {
             float x = Mathf.Ceil((point[_dataPointFetchIndex]-_maxVerticalValue)/verticalSeparatorStepIncrement);
@@ -257,8 +197,10 @@ public class Graph : MonoBehaviour
     /// <param name="removeRedundantSeparators"></param>
     private void CheckAndExpandAxis(DataPoint point, bool removeRedundantSeparators)
     {
+        //Expands the graph if necessary
         CheckAndExpandAxis(point);
         
+        //Shrinks the graph as far as possible if requested
         if(removeRedundantSeparators)
         {
             float x = Mathf.Floor((_maxVerticalValue-point[_dataPointFetchIndex])/verticalSeparatorStepIncrement);
@@ -267,7 +209,6 @@ public class Graph : MonoBehaviour
             {
                 for (int i = 0; i < x; i++)
                 {
-                    Debug.Log("Remove!");
                     RemoveVerticalSeparator();
                 } 
             }
@@ -278,18 +219,16 @@ public class Graph : MonoBehaviour
     /// <summary>
     /// Iterates through every point in the graph and animates them to their correct position
     /// </summary>
-    private void UpdatePointPositions(LineRendererController lrc)
+    private void UpdatePointPositions(LineRendererController lineRendererController)
     {
-        //LineRendererController lrc = lineRenderer.GetComponent<LineRendererController>();
-        
         int i = 0;
-        foreach (KeyValuePair<GameObject,DataPoint> dataPoint in lrc._graphPoints)
+        foreach (KeyValuePair<GameObject,DataPoint> dataPoint in lineRendererController.graphPoints)
         {
             int y = i;
             LeanTween.moveLocal(dataPoint.Key, GetGraphPosition(new Vector2(dataPoint.Value[0],dataPoint.Value[_dataPointFetchIndex])), animationSpeed).setEase(LeanTweenType.easeInOutQuad).setOnUpdateVector3(vector3 =>
             {
-                lrc.lineRenderer.Points[y] = new Vector2(vector3.x, vector3.y);
-                lrc.lineRenderer.SetAllDirty();
+                lineRendererController.lineRenderer.Points[y] = new Vector2(vector3.x, vector3.y);
+                lineRendererController.lineRenderer.SetAllDirty();  //Don't know what this does, but it makes my code work
             });
             
             i++;
@@ -301,7 +240,7 @@ public class Graph : MonoBehaviour
     /// </summary>
     /// <param name="point"></param>
     /// <returns></returns>
-    public Vector2 GetGraphPosition(Vector2 point)
+    private Vector2 GetGraphPosition(Vector2 point)
     {
         float xPos = MyResources.current.Remap(point.x, 0, _maxHorizontalValue, (_widthOfGraph/2)*-1, _widthOfGraph/2);
         float yPos = MyResources.current.Remap(point.y, 0, _maxVerticalValue, (_heightOfGraph/2)*-1, _heightOfGraph/2);
@@ -310,9 +249,10 @@ public class Graph : MonoBehaviour
     }
 
     /// <summary>
-    /// Adds a new point to the line renderer. The line renderer is responsible for rendering the lines, but not the points.
+    /// Adds a new point to the line-renderer. The line-renderer is responsible for rendering the lines, but not the points.
     /// </summary>
     /// <param name="point"></param>
+    /// <param name="lr"></param>
     private void AddPointToLineRenderer(Vector2 point,UILineRenderer lr)
     {
         var pointList = new List<Vector2>(lr.Points);
@@ -355,6 +295,9 @@ public class Graph : MonoBehaviour
         UpdateVerticalSeparatorPositions();
     }
 
+    /// <summary>
+    /// Removes a line separator from the top
+    /// </summary>
     public void RemoveVerticalSeparator()
     {
         int lastSeparatorIndex = verticalSeparators.Count - 1;
@@ -405,7 +348,6 @@ public class Graph : MonoBehaviour
         {
             UpdatePointPositions(uiLineRenderer.Value);
         }
-        
     }
     
     /// <summary>
@@ -417,12 +359,12 @@ public class Graph : MonoBehaviour
         float xPos = (_widthOfGraph / 2) + 250;
         
         //Creating new separator
-        GameObject newHorizontalSeperator = Instantiate(horizontalSeparators[0],
+        GameObject newHorizontalSeparator = Instantiate(horizontalSeparators[0],
             new Vector3(xPos,0,0),
             Quaternion.Euler(0,0,0),
             horizontalSeparators[0].transform.parent);
         
-        RectTransform newHorizontalSeperatorRect = newHorizontalSeperator.GetComponent<RectTransform>();
+        RectTransform newHorizontalSeperatorRect = newHorizontalSeparator.GetComponent<RectTransform>();
         newHorizontalSeperatorRect.anchoredPosition = new Vector2(xPos,0);
         newHorizontalSeperatorRect.sizeDelta = new Vector2(horizontalSeparatorWidth, newHorizontalSeperatorRect.sizeDelta.y);
         
@@ -435,7 +377,7 @@ public class Graph : MonoBehaviour
         newHorizontalSeparatorText.GetComponent<RectTransform>().anchoredPosition = new Vector2(xPos,0);
 
         //Adding separator and text to list, so we can update them at a later time
-        horizontalSeparators.Add(newHorizontalSeperator);
+        horizontalSeparators.Add(newHorizontalSeparator);
         horizontalSeparatorText.Add(newHorizontalSeparatorText.GetComponent<TextMeshProUGUI>());
         
         /*foreach (UILineRenderer uiLineRenderer in lineRenderers)
@@ -492,9 +434,9 @@ public class Graph : MonoBehaviour
 
         UpdateVerticalSeparatorPositions();
 
-        foreach (KeyValuePair<Player,LineRendererController> lineRenderer in _lineRenderers)
+        foreach (KeyValuePair<Player,LineRendererController> lr in _lineRenderers)
         {
-            UpdatePointPositions(lineRenderer.Value);
+            UpdatePointPositions(lr.Value);
         }
     }
 
@@ -509,9 +451,9 @@ public class Graph : MonoBehaviour
         
         UpdateVerticalSeparatorPositions();
         
-        foreach (KeyValuePair<Player,LineRendererController> lineRenderer in _lineRenderers)
+        foreach (KeyValuePair<Player,LineRendererController> lr in _lineRenderers)
         {
-            UpdatePointPositions(lineRenderer.Value);
+            UpdatePointPositions(lr.Value);
         }
     }
 }

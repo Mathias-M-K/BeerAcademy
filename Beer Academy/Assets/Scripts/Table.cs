@@ -9,9 +9,9 @@ using UnityEditor;
 #endif
 
 
-public class DataGrid : MonoBehaviour
+public class Table : MonoBehaviour
 {
-    public static DataGrid current;
+    public static Table current;
 
     private void Awake()
     {
@@ -113,24 +113,24 @@ public class DataGrid : MonoBehaviour
 }
 
 #if UNITY_EDITOR
-[CustomEditor(typeof(DataGrid))]
-public class DataGridEditor : Editor
+[CustomEditor(typeof(Table))]
+public class TableEditor : Editor
 {
     public override void OnInspectorGUI()
     {
         base.OnInspectorGUI();
 
         GUILayout.Space(10);
-        DataGrid dataGrid = (DataGrid) target;
+        Table table = (Table) target;
 
         if (GUILayout.Button("Add Image to Row"))
         {
-            dataGrid.AddFieldToRow("New Field");
+            table.AddFieldToRow("New Field");
         }
 
         if (GUILayout.Button("New Row"))
         {
-            dataGrid.AddRow(2);
+            table.AddRow(2);
         }
     }
 }

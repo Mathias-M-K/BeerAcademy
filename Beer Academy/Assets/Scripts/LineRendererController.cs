@@ -8,9 +8,8 @@ using UnityEngine.UI.Extensions;
 public class LineRendererController : MonoBehaviour
 {
     public UILineRenderer lineRenderer;
-    public GameObject graphPoint;
     public DataPoint lastPoint= new DataPoint(0,0,0);
-    public Dictionary<GameObject, DataPoint> _graphPoints = new Dictionary<GameObject, DataPoint>();
+    public readonly Dictionary<GameObject, DataPoint> graphPoints = new Dictionary<GameObject, DataPoint>();
 
     private void Awake()
     {
