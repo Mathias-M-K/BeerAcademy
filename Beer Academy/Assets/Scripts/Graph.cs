@@ -155,7 +155,8 @@ public class Graph : MonoBehaviour
         
         UpdatePointPositions(_lineRenderers[player]);
         
-        _lineRenderers[player].transform.SetAsLastSibling();
+        //TODO delete this if nessasary
+        //_lineRenderers[player].transform.SetAsLastSibling();
         
         //If the graph it to limited to show the new point, we expand it till it fits 
         CheckAndExpandAxis(point);
@@ -276,6 +277,8 @@ public class Graph : MonoBehaviour
             Quaternion.Euler(0, 0, 0),
             verticalSeparators[0].transform.parent);
         
+        newVerticalSeparator.transform.SetAsFirstSibling();
+        
         RectTransform newVerticalSeparatorRect = newVerticalSeparator.GetComponent<RectTransform>();
         newVerticalSeparatorRect.anchoredPosition = new Vector2(0, yPos);
         newVerticalSeparatorRect.sizeDelta = new Vector2(newVerticalSeparatorRect.sizeDelta.x, verticalSeparatorWidth);
@@ -377,9 +380,11 @@ public class Graph : MonoBehaviour
             Quaternion.Euler(0,0,0),
             horizontalSeparators[0].transform.parent);
         
-        RectTransform newHorizontalSeperatorRect = newHorizontalSeparator.GetComponent<RectTransform>();
-        newHorizontalSeperatorRect.anchoredPosition = new Vector2(xPos,0);
-        newHorizontalSeperatorRect.sizeDelta = new Vector2(horizontalSeparatorWidth, newHorizontalSeperatorRect.sizeDelta.y);
+        newHorizontalSeparator.transform.SetAsFirstSibling();
+        
+        RectTransform newHorizontalSeparatorRect = newHorizontalSeparator.GetComponent<RectTransform>();
+        newHorizontalSeparatorRect.anchoredPosition = new Vector2(xPos,0);
+        newHorizontalSeparatorRect.sizeDelta = new Vector2(horizontalSeparatorWidth, newHorizontalSeparatorRect.sizeDelta.y);
         
         //Creates new text field to follow the new separator
         GameObject newHorizontalSeparatorText = Instantiate(horizontalSeparatorText[0].gameObject,

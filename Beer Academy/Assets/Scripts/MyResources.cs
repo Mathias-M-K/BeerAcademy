@@ -150,5 +150,6 @@ public enum Suit
     Heart,
     Spade,
     Diamond,
-    Penis
+    Penis,
+    Circle
 }

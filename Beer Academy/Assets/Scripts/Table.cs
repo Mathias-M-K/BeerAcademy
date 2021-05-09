@@ -1,5 +1,7 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using Data_Types;
 using TMPro;
 using UnityEngine;
 using Image = UnityEngine.UI.Image;
@@ -21,6 +23,9 @@ public class Table : MonoBehaviour
     public RectTransform gridContainer;
     public RectTransform row;
     public RectTransform field;
+    
+    public RectTransform extRoundPanel;
+    public RectTransform extRoundPanelField;
 
     private RowController _currentRow;
 
@@ -29,12 +34,14 @@ public class Table : MonoBehaviour
     private float _imageWidth;
     private float _rowHeight;
     private float _rowWidth;
+    private float _extRoundPanelHidePos;
+    private float _extRoundPanelShowPos;
 
     private void Start()
     {
         _imageWidth = field.sizeDelta.x;
         _rowHeight = row.sizeDelta.y;
-
+        
         //Creating player index dictionary, where i can get their index by using their name as key
         int i = 0;
         foreach (Player player in GameController.current.GetAllPlayers())
@@ -53,9 +60,6 @@ public class Table : MonoBehaviour
         //Setting the name on the preexisting field
         field.GetChild(0).GetComponent<TextMeshProUGUI>().text = GameController.current.GetAllPlayers()[0].name;
         
-        //Editing the preexisting row
-        //row.GetChild(0).GetComponent<Image>().color = new Color(0, 0, 0, 0);
-
         //Adding a field to the row for every player, and adjusting the scrolling rect
         for (int i = 1; i < GameController.current.GetAllPlayers().Count; i++)
         {
@@ -83,16 +87,24 @@ public class Table : MonoBehaviour
 
             child.GetComponent<RowController>().SetImageWidth(width);
         }
+        
+        //Hiding the external round panel
+        _extRoundPanelShowPos = extRoundPanel.localPosition.x;
+        _extRoundPanelHidePos = _extRoundPanelShowPos - extRoundPanelField.sizeDelta.x;
+        HideExternalRoundPanel();
 
+        //Adding first row
         AddRow(1);
     }
 
     public void SetFieldValue(Player player, float value)
     {
         _currentRow.SetValue(_playerIndexDictionary[player], value);
+
+        FocusOnPlayer(player);
     }
 
-    public void AddFieldToRow(string playerName)
+    private void AddFieldToRow(string playerName)
     {
         RectTransform rect = Instantiate(field, row);
 
@@ -109,6 +121,37 @@ public class Table : MonoBehaviour
         _currentRow.SetRound(round);
 
         rect.localPosition = new Vector3(row.localPosition.x, row.localPosition.y - _rowHeight);
+        
+        //Adding a row on the external round panel
+        RectTransform roundRect = Instantiate(extRoundPanelField, extRoundPanel);
+        roundRect.GetChild(0).GetComponent<TextMeshProUGUI>().text = round.ToString();
+    }
+
+    private void FocusOnPlayer(Player player)
+    {
+        float viewableAreaWidth = GetComponent<RectTransform>().sizeDelta.x;
+        float contentWidth = gridContainer.sizeDelta.x;
+        float diff = contentWidth - viewableAreaWidth;
+        float incrementPrPlayer = diff / _playerIndexDictionary.Count;
+
+        //gridContainer.anchoredPosition = new Vector3(-20, 2, 0);
+        LeanTween.value(gridContainer.gameObject, gridContainer.anchoredPosition.x, -incrementPrPlayer * _playerIndexDictionary[player], 0.75f).setEase(LeanTweenType.easeInOutQuad)
+            .setOnUpdate(
+                (float f) =>
+                {
+                    gridContainer.anchoredPosition = new Vector3(f, 0, 0);
+                });
+    }
+
+    public void ShowExternalRoundPanel()
+    {
+        LeanTween.moveLocalX(extRoundPanel.gameObject, _extRoundPanelShowPos, 0.75f).setEase(LeanTweenType.easeInOutQuad);
+        
+    }
+
+    public void HideExternalRoundPanel()
+    {
+        LeanTween.moveLocalX(extRoundPanel.gameObject, _extRoundPanelHidePos, 0.75f).setEase(LeanTweenType.easeInOutQuad);
     }
 }
 
@@ -123,14 +166,14 @@ public class TableEditor : Editor
         GUILayout.Space(10);
         Table table = (Table) target;
 
-        if (GUILayout.Button("Add Image to Row"))
+        if (GUILayout.Button("Hide Round Panel"))
         {
-            table.AddFieldToRow("New Field");
+            table.HideExternalRoundPanel();
         }
 
-        if (GUILayout.Button("New Row"))
+        if (GUILayout.Button("Show Round Panel"))
         {
-            table.AddRow(2);
+            table.ShowExternalRoundPanel();
         }
     }
 }

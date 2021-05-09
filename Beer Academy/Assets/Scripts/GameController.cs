@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Data_Types;
-using Debugging;
+using PauseScreenAndSettings;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -24,20 +24,19 @@ public class GameController : MonoBehaviour
 
     [Header("Game Settings")] 
     public List<string> playerNames;
+    public int sipsInABeer;
     private readonly List<Player> _players = new List<Player>();
     private int _currentPlayer = 0;
     
     [Header("Card Flipping Elements")]
     public GameObject currentCardPos;
     public GameObject nextCardPos;
-    public Card nextCard;
-
-    [Header("Other")] 
-    public DebugPanelController debugPanelController;
+    private Card _nextCard;
 
     //UI
     private Dictionary<int,TextMeshProUGUI> _cardCounters;
     private readonly Dictionary<int, int> _cardCounterValues = new Dictionary<int, int>();
+    private Dictionary<Player, PlayerCard> _playerCards = new Dictionary<Player, PlayerCard>();
     private TextMeshProUGUI _roundCounterText;
     private TextMeshProUGUI _timerText;
     private TextMeshProUGUI _currentPlayerName;
@@ -49,6 +48,13 @@ public class GameController : MonoBehaviour
     //Timer
     private bool _timerStarted = false;
     private DateTime _startTime;
+
+    private DateTime _pauseStartTime;
+    private bool _gamePaused;
+
+    private TimeSpan _totalTimeoutTime;
+
+    //private List<TimeSpan> _timeouts = new List<TimeSpan>();
     
     //Counter 
     private int _roundCounter = 1;
@@ -65,8 +71,32 @@ public class GameController : MonoBehaviour
         
         SetUp();
         
-        nextCard = SpawnCard(GetRandomCard());
+        _nextCard = SpawnCard(GetRandomCard());
         nextCardPos.SetActive(false);
+        
+        
+        //Subscribing to pause events
+        PausePanelController.current.Pause += OnPause;
+        PausePanelController.current.Unpause += OnUnPause;
+    }
+
+    private void OnUnPause()
+    {
+        if (!_timerStarted) return;
+
+        _gamePaused = false;
+
+        TimeSpan timeout = DateTime.Now - _pauseStartTime;
+
+        _totalTimeoutTime += timeout;
+    }
+
+    private void OnPause()
+    {
+        if (!_timerStarted) return;
+        
+        _pauseStartTime = DateTime.Now;
+        _gamePaused = true;
     }
 
     private void CreatePlayerList()
@@ -85,24 +115,20 @@ public class GameController : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            Application.Quit();
+            PausePanelController.current.TogglePanel();
         }
 
-        if (Input.GetKey(KeyCode.LeftControl) && Input.GetKeyDown(KeyCode.D))
-        {
-            debugPanelController.Toggle();
-        }
-        
-        
-        if(_timerStarted)
+        if(_timerStarted && !_gamePaused)
         {
             TimeSpan we = DateTime.Now - _startTime;
+
+            we -= _totalTimeoutTime;
             
             _timerText.text = $"{we.Hours:00}:{we.Minutes:00}:{we.Seconds:00}";
         }
-        
-        
-        if (Input.GetKeyDown(KeyCode.Space) && !_gameOver)
+
+
+        if (Input.GetKeyDown(KeyCode.Space) && !_gameOver && !ChuckPanelController.current.timerActive && !PausePanelController.current.panelActive)
         {
             if (!_timerStarted)
             {
@@ -116,6 +142,7 @@ public class GameController : MonoBehaviour
 
     private void SetUp()
     {
+        //Creating a deck of cards for each player
         for (int i = 2; i <= 14; i++)
         {
             for (int y = 0; y < _players.Count; y++)
@@ -123,8 +150,7 @@ public class GameController : MonoBehaviour
                 _cards.Add(new Card(i, (Suit)y,MyResources.current.GetPlayingCard(i)));
             }
         }
-        
-        SetAllCounters(_players.Count); 
+        SetAllCounters(_players.Count);
     }
 
     /// <summary>
@@ -154,11 +180,15 @@ public class GameController : MonoBehaviour
 
     private void ShowNextCard()
     {
-        if(_gameOver) return;
-
         Player currentPlayer = GetNextPlayer();
 
         Card newNextCard = null;
+        
+        if (_nextCard.rank == 14)
+        {
+            ChuckPanelController.current.ShowTimer(currentPlayer,_nextCard.suit);
+        }
+        
         if (_cards.Count > 0)
         {
             newNextCard = SpawnCard(GetRandomCard());
@@ -167,25 +197,37 @@ public class GameController : MonoBehaviour
         {
             _gameOver = true;
         }
-
-        currentPlayer.sips += nextCard.rank;
-            
-        Graph.current.AddDataPoint(new DataPoint(_roundCounter,currentPlayer.sips,currentPlayer.sips/_roundCounter),currentPlayer);
-        Table.current.SetFieldValue(currentPlayer,nextCard.rank);
-
+        
+        //Updating player with new info
+        
+        currentPlayer.sips += _nextCard.rank;
+        currentPlayer.avgSips = currentPlayer.sips / _roundCounter;
+        currentPlayer.beers = currentPlayer.sips / sipsInABeer;
+        if (_nextCard.rank == 14) currentPlayer.sips--;
+        
+        //Updating text
         _currentPlayerName.text = currentPlayer.name;
         _currentPlayerName.color = currentPlayer.color;
 
-        LeanTween.move(nextCard.cardObj, currentCardPos.transform.position, 0.5f).setEase(LeanTweenType.easeInOutQuad);
-
-        CardDisplay cd = nextCard.cardObj.GetComponent<CardDisplay>();
+        //Moving card to the used-cards stack and flipping it so it faces up
+        LeanTween.move(_nextCard.cardObj, currentCardPos.transform.position, 0.5f).setEase(LeanTweenType.easeInOutQuad);
+        CardDisplay cd = _nextCard.cardObj.GetComponent<CardDisplay>();
         cd.TurnCard(0.5f);
         
-
+        //Updating the card counter for the used card
         SubtractOneFromCounter(cd.GetRank());
 
-        nextCard.cardObj.transform.SetAsLastSibling();
-        nextCard = newNextCard;
+        _nextCard.cardObj.transform.SetAsLastSibling();
+        
+        
+        //Updating components
+        Graph.current.AddDataPoint(new DataPoint(_roundCounter,currentPlayer.sips,currentPlayer.avgSips),currentPlayer);
+        Table.current.SetFieldValue(currentPlayer,_nextCard.rank);
+        PlayerCardsManager.current.UpdatePlayer(currentPlayer);
+        
+        
+        _nextCard = newNextCard;
+       
     }
 
     private Card SpawnCard(Card cardToSpawn)
@@ -219,24 +261,7 @@ public class GameController : MonoBehaviour
         
         return cardToSpawn;
     }
-
-    /*private GameObject GetRandomCard()
-    {
-        int randomCardNumber = Random.Range(0, _cards.Count);
-
-        Card randomCard = _cards[randomCardNumber];
-        _cards.RemoveAt(randomCardNumber);
-
-        GameObject randomCardObj = MyResources.current.GetPlayingCard(randomCard.rank);
-
-        CardDisplay randomCardDisplay = randomCardObj.GetComponent<CardDisplay>();
-        randomCardDisplay.SetSuit(randomCard.suit);
-        randomCardDisplay.SetRank(randomCard.rank);
-        //randomCardObj.GetComponent<CardDisplay>().suit = randomCard.suit;
-        
-        Debug.Log($"Returning {randomCard.suit} {randomCard.rank}");
-        return randomCardObj;
-    }*/
+    
     private Card GetRandomCard()
     {
         int randomCardNumber = Random.Range(0, _cards.Count);
@@ -307,7 +332,20 @@ public class GameController : MonoBehaviour
             
             _cardCounterValues.Add(counter.Key,newValue);
         }
+    }
 
-        
+    public List<float> GetChuckTimes()
+    {
+        List<float> times = new List<float>();
+
+        foreach (Player player in _players)
+        {
+            foreach (float time in player.GetChuckTimes())
+            {
+                times.Add(time);
+            }
+        }
+
+        return times;
     }
 }
