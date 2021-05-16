@@ -6947,8 +6947,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: 
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 125cb55b44b24c4393181402bc6200e6, type: 2}
+  m_sharedMaterial: {fileID: 2100000, guid: 125cb55b44b24c4393181402bc6200e6, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -10265,8 +10265,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Mathias
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 125cb55b44b24c4393181402bc6200e6, type: 2}
+  m_sharedMaterial: {fileID: 2100000, guid: 125cb55b44b24c4393181402bc6200e6, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -14193,6 +14193,7 @@ GameObject:
   - component: {fileID: 1005380605}
   - component: {fileID: 1005380607}
   - component: {fileID: 1005380606}
+  - component: {fileID: 1005380609}
   m_Layer: 0
   m_Name: Resources
   m_TagString: Untagged
@@ -14314,6 +14315,18 @@ RectTransform:
   m_AnchoredPosition: {x: 1373, y: 733}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1005380609
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1005380604}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a0a8695669c041d080aa5237c3e1425b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1013504273
 GameObject:
   m_ObjectHideFlags: 0
@@ -21783,13 +21796,13 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1498923662}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.15294118, g: 0.68235296, b: 0.3764706, a: 1}
+  m_Color: {r: 0, g: 1, b: 0.42352942, a: 1}
   m_RaycastTarget: 1
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -25143,6 +25156,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 383750a881f4478ab1ed475f2e25e141, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  defaultFrame: {fileID: 21300000, guid: beb4ef4d122fefb44bdd1442367a8777, type: 3}
+  focusFrame: {fileID: 21300000, guid: 014e4350c5916b14ea6b235afebcaec9, type: 3}
 --- !u!114 &1809910364 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 1632690612199317096, guid: 96180996f3a8ed343b7631bac31333b3,

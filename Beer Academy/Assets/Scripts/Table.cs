@@ -2,12 +2,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using Data_Types;
+using TableHelpClasses;
 using TMPro;
 using UnityEngine;
 using Image = UnityEngine.UI.Image;
-
 #if UNITY_EDITOR
 using UnityEditor;
+
 #endif
 
 
@@ -23,13 +24,14 @@ public class Table : MonoBehaviour
     public RectTransform gridContainer;
     public RectTransform row;
     public RectTransform field;
-    
+
     public RectTransform extRoundPanel;
     public RectTransform extRoundPanelField;
 
     private RowController _currentRow;
 
     private readonly Dictionary<Player, int> _playerIndexDictionary = new Dictionary<Player, int>();
+    private List<RowController> _rowControllers = new List<RowController>();
 
     private float _imageWidth;
     private float _rowHeight;
@@ -39,9 +41,12 @@ public class Table : MonoBehaviour
 
     private void Start()
     {
+        GUIEvents.current.MouseHover += OnMouseHover;
+        GUIEvents.current.MouseExit += OnMouseExit;
+
         _imageWidth = field.sizeDelta.x;
         _rowHeight = row.sizeDelta.y;
-        
+
         //Creating player index dictionary, where i can get their index by using their name as key
         int i = 0;
         foreach (Player player in GameController.current.GetAllPlayers())
@@ -53,20 +58,47 @@ public class Table : MonoBehaviour
         StartCoroutine(Setup());
     }
 
+    private void OnMouseExit(Player player)
+    {
+        int playerIndex = _playerIndexDictionary[player];
+        
+        foreach (RowController rowController in _rowControllers)
+        {
+            if (rowController == null) continue;
+            rowController.SetFrameColor(playerIndex, Color.white, false);
+            rowController.SetTextColor(playerIndex, Color.white);
+        }
+    }
+
+    private void OnMouseHover(Player player)
+    {
+        int playerIndex = _playerIndexDictionary[player];
+        
+        foreach (RowController rowController in _rowControllers)
+        {
+            if (rowController == null) continue;
+            rowController.SetFrameColor(playerIndex, player.color, true);
+            rowController.SetTextColor(playerIndex, player.color);
+        }
+        
+        FocusOnPlayer(player);
+    }
+
     private IEnumerator Setup()
     {
         yield return new WaitUntil(() => row.sizeDelta.x > 0);
 
         //Setting the name on the preexisting field
         field.GetChild(0).GetComponent<TextMeshProUGUI>().text = GameController.current.GetAllPlayers()[0].name;
-        
+
         //Adding a field to the row for every player, and adjusting the scrolling rect
         for (int i = 1; i < GameController.current.GetAllPlayers().Count; i++)
         {
             AddFieldToRow(GameController.current.GetAllPlayers()[i].name);
         }
 
-        gridContainer.sizeDelta = new Vector2(row.sizeDelta.x + ((GameController.current.GetAllPlayers().Count - 1) * _imageWidth),
+        gridContainer.sizeDelta = new Vector2(
+            row.sizeDelta.x + ((GameController.current.GetAllPlayers().Count - 1) * _imageWidth),
             gridContainer.sizeDelta.y);
 
 
@@ -87,11 +119,13 @@ public class Table : MonoBehaviour
 
             child.GetComponent<RowController>().SetImageWidth(width);
         }
-        
+
         //Hiding the external round panel
         _extRoundPanelShowPos = extRoundPanel.localPosition.x;
         _extRoundPanelHidePos = _extRoundPanelShowPos - extRoundPanelField.sizeDelta.x;
         HideExternalRoundPanel();
+
+        _rowControllers.Add(_currentRow);
 
         //Adding first row
         AddRow(1);
@@ -121,7 +155,9 @@ public class Table : MonoBehaviour
         _currentRow.SetRound(round);
 
         rect.localPosition = new Vector3(row.localPosition.x, row.localPosition.y - _rowHeight);
-        
+
+        _rowControllers.Add(_currentRow);
+
         //Adding a row on the external round panel
         RectTransform roundRect = Instantiate(extRoundPanelField, extRoundPanel);
         roundRect.GetChild(0).GetComponent<TextMeshProUGUI>().text = round.ToString();
@@ -135,23 +171,22 @@ public class Table : MonoBehaviour
         float incrementPrPlayer = diff / _playerIndexDictionary.Count;
 
         //gridContainer.anchoredPosition = new Vector3(-20, 2, 0);
-        LeanTween.value(gridContainer.gameObject, gridContainer.anchoredPosition.x, -incrementPrPlayer * _playerIndexDictionary[player], 0.75f).setEase(LeanTweenType.easeInOutQuad)
+        LeanTween.value(gridContainer.gameObject, gridContainer.anchoredPosition.x,
+                -incrementPrPlayer * _playerIndexDictionary[player], 0.75f).setEase(LeanTweenType.easeInOutQuad)
             .setOnUpdate(
-                (float f) =>
-                {
-                    gridContainer.anchoredPosition = new Vector3(f, 0, 0);
-                });
+                (float f) => { gridContainer.anchoredPosition = new Vector3(f, 0, 0); });
     }
 
     public void ShowExternalRoundPanel()
     {
-        LeanTween.moveLocalX(extRoundPanel.gameObject, _extRoundPanelShowPos, 0.75f).setEase(LeanTweenType.easeInOutQuad);
-        
+        LeanTween.moveLocalX(extRoundPanel.gameObject, _extRoundPanelShowPos, 0.75f)
+            .setEase(LeanTweenType.easeInOutQuad);
     }
 
     public void HideExternalRoundPanel()
     {
-        LeanTween.moveLocalX(extRoundPanel.gameObject, _extRoundPanelHidePos, 0.75f).setEase(LeanTweenType.easeInOutQuad);
+        LeanTween.moveLocalX(extRoundPanel.gameObject, _extRoundPanelHidePos, 0.75f)
+            .setEase(LeanTweenType.easeInOutQuad);
     }
 }
 

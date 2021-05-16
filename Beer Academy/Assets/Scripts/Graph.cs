@@ -60,14 +60,42 @@ public class Graph : MonoBehaviour
     
     public void Start()
     {
+        GUIEvents.current.MouseHover += OnMouseHover;
+        GUIEvents.current.MouseExit += OnMouseExit;
+        
         //Because i need to do a lot of animations, i have to initiate it
         LeanTween.init(1600);
         
         StartCoroutine(InitiateGraph());
         _verticalSeparatorStepIncrementSaved = verticalSeparatorStepIncrement;
     }
-    
-    
+
+    private void OnMouseExit(Player player)
+    {
+        foreach (KeyValuePair<Player,LineRendererController> lineRendererController in _lineRenderers)
+        {
+            lineRendererController.Value.SetColor(lineRendererController.Key.color);
+            lineRendererController.Value.lineRenderer.LineThickness = 2;
+        }
+    }
+
+    private void OnMouseHover(Player player)
+    {
+        foreach (KeyValuePair<Player,LineRendererController> lineRendererController in _lineRenderers)
+        {
+            if (lineRendererController.Key != player)
+            {
+                lineRendererController.Value.SetColor(Color.grey);
+            }
+            else
+            {
+                lineRendererController.Value.gameObject.transform.SetAsLastSibling();
+                lineRendererController.Value.lineRenderer.LineThickness = 4;
+            }
+        }
+    }
+
+
     /// <summary>
     /// Initiates the graph with the default separators and the height and width of the graph in the current screen aspect ratio.
     /// The method waits until it can fetch the dimensions of the graph box, since these dimensions are critical for the rest of the code.
