@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using Michsky.UI.ModernUIPack;
 using UnityEngine;
@@ -18,6 +19,11 @@ public class WelcomeScreenController : MonoBehaviour
 
     private int _flowPosition = 0;  //Value to determine where the user is in the flow
     // Start is called before the first frame update
+
+    private void Start()
+    {
+        Debug.LogError("Opening console");
+    }
 
     public void NextButtonPressed()
     {
