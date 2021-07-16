@@ -1,16 +1,15 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Threading;
+using System.Security.Cryptography;
 using Data_Types;
 using PauseScreenAndSettings;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using Random = UnityEngine.Random;
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
+using Timer = SupportClasses.Timer;
+
 
 
 public class ChuckPanelController : MonoBehaviour
@@ -40,6 +39,11 @@ public class ChuckPanelController : MonoBehaviour
 
     [Header("Chuck History Panel")] 
     public ChuckHistoryController chuckHistoryController;
+
+    [Header("Audio")] 
+    [SerializeField] private AudioSource audioComponent;
+    [SerializeField] private List<AudioClip> audioClipsBefore;
+    [SerializeField] private List<AudioClip> audioClipsAfter;
     
     [Header("Other")]
     [SerializeField] private GameObject startBtn;
@@ -49,12 +53,10 @@ public class ChuckPanelController : MonoBehaviour
     [SerializeField] private Image background;
 
     [SerializeField] private TextMeshProUGUI playerName;
-    [SerializeField] private TextMeshProUGUI minText;
-    [SerializeField] private TextMeshProUGUI secText;
-    [SerializeField] private TextMeshProUGUI milSecText;
     [SerializeField] private TextMeshProUGUI feedbackText;
+    [SerializeField] private Timer timer;
 
-
+    public event Action ChuckPanelClose;
 
     
     private DateTime _startTime;
@@ -68,9 +70,6 @@ public class ChuckPanelController : MonoBehaviour
 
     private float _hidePos;
 
-
-    public string newText;
-
     private void Start()
     {
         _hidePos = transform.localPosition.y;
@@ -82,7 +81,7 @@ public class ChuckPanelController : MonoBehaviour
         _currentPlayer = player;
         _currentSuit = suit;
         
-        playerName.text = player.name;
+        playerName.text = player.Name;
         
         startBtn.SetActive(true);
         finishBtn.SetActive(false);
@@ -91,15 +90,13 @@ public class ChuckPanelController : MonoBehaviour
         _spaceBarReady = false;
         _playerFinished = false;
 
-        minText.text = "00";
-        secText.text = "00";
-        milSecText.text = "000";
+        timer.SetTimer(TimeSpan.FromMinutes(0));
 
 
         int randomNr = Random.Range(0, welcomeMessages.Count);
         feedbackText.text = welcomeMessages[randomNr];
 
-        GetComponent<Image>().color = player.color;
+        GetComponent<Image>().color = player.Color;
         
         ShowPanel();
 
@@ -114,9 +111,11 @@ public class ChuckPanelController : MonoBehaviour
         _startTime = DateTime.Now;
         _timerRunning = true;
         
-        int randomNr = Random.Range(0, welcomeMessages.Count);
+        int randomNr = Random.Range(0, drinkingMessages.Count);
         ChangeFeedbackText(drinkingMessages[randomNr]);
 
+        audioComponent.Stop();
+        
         StartCoroutine(WaitForPlayerToFinish());
     }
 
@@ -136,7 +135,15 @@ public class ChuckPanelController : MonoBehaviour
         
         _currentPlayer.AddNewChuckTime(time);
         
+        StatTracker.statTracker.LogChuckTime(ts,_currentPlayer);
+        
         chuckHistoryController.AddNewChuckTime(_currentPlayer,time,_currentSuit);
+        
+        
+        //Choosing audio clip and playing it
+        int clip = Random.Range(0,audioClipsAfter.Count);
+        audioComponent.clip = audioClipsAfter[clip];
+        audioComponent.Play();
     }
 
     private IEnumerator WaitForPlayerToFinish()
@@ -144,12 +151,8 @@ public class ChuckPanelController : MonoBehaviour
         while (_timerRunning)
         {
             TimeSpan we = DateTime.Now - _startTime;
-            
-            //timerText.text = $"{we.Minutes:00}:{we.Seconds:00}:{we.Milliseconds:000}";
 
-            minText.text = $"{we.Minutes:00}";
-            secText.text = $"{we.Seconds:00}";
-            milSecText.text = $"{we.Milliseconds:000}";
+            timer.SetTimer(we);
             
             yield return null;
         }
@@ -185,11 +188,17 @@ public class ChuckPanelController : MonoBehaviour
         }
     }
 
-    public void ShowPanel()
+    private void ShowPanel()
     {
         LeanTween.moveLocalY(gameObject, 0, animationTimeIn).setEase(easeIn);
         LeanTween.color(background.rectTransform, new Color32(0, 0, 0, 134), animationTimeIn).setEase(LeanTweenType.easeInOutQuad);
         timerActive = true;
+
+        
+        //Choosing audio clip and playing it
+        int clip = Random.Range(0,audioClipsBefore.Count);
+        audioComponent.clip = audioClipsBefore[clip];
+        audioComponent.Play();
     }
 
     public void HidePanel()
@@ -197,9 +206,11 @@ public class ChuckPanelController : MonoBehaviour
         LeanTween.moveLocalY(gameObject, _hidePos, animationTimeOut).setEase(easeOut);
         LeanTween.color(background.rectTransform, new Color32(0, 0, 0, 0), animationTimeOut).setEase(LeanTweenType.easeInOutQuad);
         timerActive = false;
+        
+        OnChuckPanelClose();
     }
 
-    public void ChangeFeedbackText(string newFeedbackText)
+    private void ChangeFeedbackText(string newFeedbackText)
     {
         LeanTween.moveLocalY(feedbackText.gameObject, -50, feedbackTextAnimationTimeOut).setEase(feedbackTextEaseOut).setOnComplete(() =>
         {
@@ -251,33 +262,9 @@ public class ChuckPanelController : MonoBehaviour
         throw new Exception(
             $"GetChuckTimePerformance have failed. Input was ranked as {i}, but somehow no statement was returned before hitting the exception line");
     }
-}
 
-#if UNITY_EDITOR
-[CustomEditor(typeof(ChuckPanelController))]
-public class ChuckPanelControllerEditor : Editor
-{ public override void OnInspectorGUI()
+    protected virtual void OnChuckPanelClose()
     {
-
-        DrawDefaultInspector();
-        
-        ChuckPanelController chuckPanel = (ChuckPanelController) target;
-
-        if (GUILayout.Button("Show"))
-        {
-            chuckPanel.ShowPanel();
-        }
-        if (GUILayout.Button("Hide"))
-        {
-            chuckPanel.HidePanel();
-        }
-        if (GUILayout.Button("Change Text"))
-        {
-            chuckPanel.ChangeFeedbackText(chuckPanel.newText);
-        }
-        
-
-        
+        ChuckPanelClose?.Invoke();
     }
 }
-#endif

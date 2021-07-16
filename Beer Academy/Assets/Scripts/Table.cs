@@ -31,7 +31,7 @@ public class Table : MonoBehaviour
     private RowController _currentRow;
 
     private readonly Dictionary<Player, int> _playerIndexDictionary = new Dictionary<Player, int>();
-    private List<RowController> _rowControllers = new List<RowController>();
+    private readonly List<RowController> _rowControllers = new List<RowController>();
 
     private float _imageWidth;
     private float _rowHeight;
@@ -41,8 +41,9 @@ public class Table : MonoBehaviour
 
     private void Start()
     {
-        GUIEvents.current.MouseHover += OnMouseHover;
-        GUIEvents.current.MouseExit += OnMouseExit;
+        GUIEvents.current.SetSelected += OnSetSelected;
+        GUIEvents.current.SetDeselected += OnSetDeselected;
+        GUIEvents.current.ClearSelection += OnSetDeselected;
 
         _imageWidth = field.sizeDelta.x;
         _rowHeight = row.sizeDelta.y;
@@ -57,31 +58,37 @@ public class Table : MonoBehaviour
 
         StartCoroutine(Setup());
     }
-
-    private void OnMouseExit(Player player)
+    
+    private void OnSetDeselected(List<Player> players)
     {
-        int playerIndex = _playerIndexDictionary[player];
-        
-        foreach (RowController rowController in _rowControllers)
+        foreach (Player player in players)
         {
-            if (rowController == null) continue;
-            rowController.SetFrameColor(playerIndex, Color.white, false);
-            rowController.SetTextColor(playerIndex, Color.white);
+            int playerIndex = _playerIndexDictionary[player];
+
+            foreach (RowController rowController in _rowControllers)
+            {
+                if(rowController == null) continue;
+                rowController.SetFrameColor(playerIndex, Color.white, false);
+                rowController.SetTextColor(playerIndex, Color.white);
+            }
         }
     }
 
-    private void OnMouseHover(Player player)
+    private void OnSetSelected(List<Player> players)
     {
-        int playerIndex = _playerIndexDictionary[player];
-        
-        foreach (RowController rowController in _rowControllers)
+        foreach (Player player in players)
         {
-            if (rowController == null) continue;
-            rowController.SetFrameColor(playerIndex, player.color, true);
-            rowController.SetTextColor(playerIndex, player.color);
-        }
+            int playerIndex = _playerIndexDictionary[player];
         
-        FocusOnPlayer(player);
+            foreach (RowController rowController in _rowControllers)
+            {
+                if (rowController == null) continue;
+                rowController.SetFrameColor(playerIndex, player.Color, true);
+                rowController.SetTextColor(playerIndex, player.Color);
+            }
+        
+            FocusOnPlayer(player);
+        }
     }
 
     private IEnumerator Setup()
@@ -89,12 +96,12 @@ public class Table : MonoBehaviour
         yield return new WaitUntil(() => row.sizeDelta.x > 0);
 
         //Setting the name on the preexisting field
-        field.GetChild(0).GetComponent<TextMeshProUGUI>().text = GameController.current.GetAllPlayers()[0].name;
+        field.GetChild(0).GetComponent<TextMeshProUGUI>().text = GameController.current.GetAllPlayers()[0].Name;
 
         //Adding a field to the row for every player, and adjusting the scrolling rect
         for (int i = 1; i < GameController.current.GetAllPlayers().Count; i++)
         {
-            AddFieldToRow(GameController.current.GetAllPlayers()[i].name);
+            AddFieldToRow(GameController.current.GetAllPlayers()[i].Name);
         }
 
         gridContainer.sizeDelta = new Vector2(
@@ -168,13 +175,23 @@ public class Table : MonoBehaviour
         float viewableAreaWidth = GetComponent<RectTransform>().sizeDelta.x;
         float contentWidth = gridContainer.sizeDelta.x;
         float diff = contentWidth - viewableAreaWidth;
-        float incrementPrPlayer = diff / _playerIndexDictionary.Count;
+        float incrementPrPlayer = diff / (_playerIndexDictionary.Count-1);
 
         //gridContainer.anchoredPosition = new Vector3(-20, 2, 0);
-        LeanTween.value(gridContainer.gameObject, gridContainer.anchoredPosition.x,
-                -incrementPrPlayer * _playerIndexDictionary[player], 0.75f).setEase(LeanTweenType.easeInOutQuad)
-            .setOnUpdate(
-                (float f) => { gridContainer.anchoredPosition = new Vector3(f, 0, 0); });
+
+        try
+        {
+            LeanTween.value(gridContainer.gameObject, gridContainer.anchoredPosition.x,
+                    -incrementPrPlayer * _playerIndexDictionary[player], 0.75f).setEase(LeanTweenType.easeInOutQuad)
+                .setOnUpdate(
+                    (float f) => { gridContainer.anchoredPosition = new Vector3(f, 0, 0); });
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            Debug.Log("GOT IT: TABLE");
+        }
+        
     }
 
     public void ShowExternalRoundPanel()

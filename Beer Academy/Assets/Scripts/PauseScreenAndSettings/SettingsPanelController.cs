@@ -32,7 +32,7 @@ namespace PauseScreenAndSettings
         
         public void Back()
         {
-            pausePanelController.ShowPanel();
+            pausePanelController.ShowPanel(true);
             HidePanel();
         }
     }

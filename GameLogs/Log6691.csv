@@ -1,0 +1,34 @@
+Game Started:,7/16/2021 1:34:26 PM
+00:00:00,a,Club, 5
+00:00:00,b,Heart, 5
+00:00:00,a,Club, 9
+00:00:00,b,Heart, 7
+00:00:01,a,Heart, 14
+Chuck!,a,00:03:815
+00:00:07,b,Club, 10
+00:00:07,a,Club, 4
+00:00:07,b,Heart, 9
+00:00:08,a,Heart, 3
+00:00:08,b,Club, 7
+00:00:08,a,Club, 6
+00:00:09,b,Club, 8
+00:00:09,a,Club, 3
+00:00:09,b,Club, 14
+Chuck!,b,00:01:878
+00:00:13,a,Club, 13
+00:00:14,b,Heart, 10
+00:00:14,a,Heart, 6
+00:00:14,b,Heart, 2
+00:00:14,a,Heart, 4
+00:00:15,b,Heart, 11
+00:00:15,a,Club, 12
+00:00:15,b,Heart, 8
+00:00:16,a,Heart, 13
+00:00:16,b,Heart, 12
+00:00:16,a,Club, 11
+00:00:17,b,Club, 2
+Game Ended,00:00:17
+name,nr of beers,nr of sips,avg Sips,time Total,avg Time
+a,7.357143,103,7.923077,00:00:03.9384526,00:00:00.3030000
+b,7.5,105,8.076923,00:00:04.3467447,00:00:00.3340000
+File End

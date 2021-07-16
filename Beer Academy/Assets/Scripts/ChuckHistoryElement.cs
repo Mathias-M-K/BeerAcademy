@@ -17,15 +17,6 @@ public class ChuckHistoryElement : MonoBehaviour
         public TextMeshProUGUI playerNameText;
         public Image suitImage;
         
-
-        private void Update()
-        {
-            if (Input.GetKeyDown(KeyCode.F))
-            {
-                FindTarget();
-            }
-        }
-
         public void FindTarget()
         {
             LeanTween.move(gameObject, target.transform.position, 0.5f).setEase(LeanTweenType.easeInOutQuad);
@@ -37,14 +28,14 @@ public class ChuckHistoryElement : MonoBehaviour
             this.suit = suit;
             this.target = target;
             
-            playerNameText.text = player.name;
+            playerNameText.text = player.Name;
             suitImage.sprite = MyResources.current.GetSuitSprite(suit);
 
             TimeSpan ts = TimeSpan.FromMilliseconds(Mathf.Floor(time));
 
             timeText.text = $"{ts.Minutes:00}:{ts.Seconds:00}:{ts.Milliseconds:000}";
 
-            GetComponent<Image>().color = player.color;
+            GetComponent<Image>().color = player.Color;
 
         }
 

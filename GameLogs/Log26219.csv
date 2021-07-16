@@ -1,0 +1,94 @@
+Game Started:,7/16/2021 11:26:36 AM
+00:00:00,Mathias,Penis, 10
+00:00:00,Frederik Witt,Club, 12
+00:00:00,Anton Slim,Heart, 3
+00:00:00,Kockkefar,Club, 6
+00:00:00,LasseBasse,Diamond, 8
+00:00:00,Marianne Flach,Club, 11
+00:00:00,Mathias,Penis, 4
+00:00:01,Frederik Witt,Diamond, 2
+00:00:58,Anton Slim,Diamond, 6
+00:00:58,Kockkefar,Circle, 14
+Chuck!,Kockkefar,00:00:165
+00:01:00,LasseBasse,Diamond, 10
+00:01:00,Marianne Flach,Penis, 13
+00:01:00,Mathias,Circle, 3
+00:01:00,Frederik Witt,Diamond, 14
+Chuck!,Frederik Witt,00:00:169
+00:01:01,Anton Slim,Circle, 8
+00:01:01,Kockkefar,Spade, 6
+00:01:01,LasseBasse,Circle, 2
+00:01:01,Marianne Flach,Circle, 13
+00:01:01,Mathias,Club, 2
+00:01:01,Frederik Witt,Circle, 12
+00:01:02,Anton Slim,Penis, 14
+Chuck!,Anton Slim,00:00:145
+00:01:02,Kockkefar,Spade, 9
+00:01:02,LasseBasse,Diamond, 12
+00:01:02,Marianne Flach,Spade, 11
+00:01:03,Mathias,Spade, 8
+00:01:03,Frederik Witt,Penis, 3
+00:01:03,Anton Slim,Circle, 9
+00:01:03,Kockkefar,Heart, 4
+00:01:03,LasseBasse,Spade, 2
+00:01:03,Marianne Flach,Diamond, 11
+00:01:04,Mathias,Spade, 3
+00:01:04,Frederik Witt,Heart, 11
+00:01:04,Anton Slim,Club, 4
+00:01:04,Kockkefar,Heart, 12
+00:01:04,LasseBasse,Club, 5
+00:01:04,Marianne Flach,Heart, 8
+00:01:04,Mathias,Club, 14
+Chuck!,Mathias,00:00:158
+00:01:05,Frederik Witt,Diamond, 3
+00:01:05,Anton Slim,Diamond, 5
+00:01:05,Kockkefar,Diamond, 13
+00:01:06,LasseBasse,Heart, 9
+00:01:06,Marianne Flach,Club, 10
+00:01:06,Mathias,Circle, 11
+00:01:06,Frederik Witt,Club, 8
+00:01:06,Anton Slim,Club, 9
+00:01:06,Kockkefar,Penis, 9
+00:01:06,LasseBasse,Club, 13
+00:01:07,Marianne Flach,Heart, 2
+00:01:07,Mathias,Circle, 5
+00:01:07,Frederik Witt,Penis, 5
+00:01:07,Anton Slim,Penis, 6
+00:01:07,Kockkefar,Diamond, 7
+00:01:07,LasseBasse,Circle, 6
+00:01:08,Marianne Flach,Circle, 7
+00:01:08,Mathias,Club, 7
+00:01:08,Frederik Witt,Circle, 10
+00:01:08,Anton Slim,Spade, 10
+00:01:08,Kockkefar,Diamond, 4
+00:01:08,LasseBasse,Penis, 8
+00:01:08,Marianne Flach,Spade, 7
+00:01:09,Mathias,Diamond, 9
+00:01:09,Frederik Witt,Spade, 14
+Chuck!,Frederik Witt,00:00:152
+00:01:09,Anton Slim,Spade, 5
+00:01:10,Kockkefar,Spade, 12
+00:01:10,LasseBasse,Heart, 5
+00:01:10,Marianne Flach,Penis, 12
+00:01:10,Mathias,Heart, 14
+Chuck!,Mathias,00:00:150
+00:01:11,Frederik Witt,Penis, 7
+00:01:11,Anton Slim,Spade, 4
+00:01:11,Kockkefar,Circle, 4
+00:01:11,LasseBasse,Heart, 13
+00:01:11,Marianne Flach,Penis, 2
+00:01:11,Mathias,Penis, 11
+00:01:12,Frederik Witt,Spade, 13
+00:01:12,Anton Slim,Club, 3
+00:01:12,Kockkefar,Heart, 10
+00:01:12,LasseBasse,Heart, 6
+00:01:12,Marianne Flach,Heart, 7
+Game Ended,00:01:12
+name,nr of beers,nr of sips,avg Sips,time Total,avg Time
+Mathias,7.214286,101,7.769231,00:00:01.8811199,00:00:00.1450000
+Frederik Witt,8.142858,114,8.769231,00:00:02.0710641,00:00:00.1590000
+Anton Slim,6.142857,86,6.615385,00:00:59.5534219,00:00:04.5810000
+Kockkefar,7.857143,110,8.461538,00:00:02.0687804,00:00:00.1590000
+LasseBasse,7.071429,99,7.615385,00:00:02.0649369,00:00:00.1590000
+Marianne Flach,1.280899,114,8.769231,00:00:01.9656076,00:00:00.1510000
+File End

@@ -56,42 +56,52 @@ public class Graph : MonoBehaviour
     
     private float _highestAvgSip = 0.01f;
     private float _highestSipCount = 0.01f;
+    private float _highestAvgTime = 0.01f;
+    private float _highestTurnTime = 0.01f;
     
     
     public void Start()
     {
-        GUIEvents.current.MouseHover += OnMouseHover;
-        GUIEvents.current.MouseExit += OnMouseExit;
+        GUIEvents.current.SetSelected += OnSetSelected;
+        GUIEvents.current.SetDeselected += OnSetDeselected;
+        GUIEvents.current.ClearSelection += OnClearSelection;
         
         //Because i need to do a lot of animations, i have to initiate it
-        LeanTween.init(1600);
+        LeanTween.init(12800*100);
         
         StartCoroutine(InitiateGraph());
         _verticalSeparatorStepIncrementSaved = verticalSeparatorStepIncrement;
     }
 
-    private void OnMouseExit(Player player)
+    private void OnClearSelection(List<Player> players)
     {
-        foreach (KeyValuePair<Player,LineRendererController> lineRendererController in _lineRenderers)
+        foreach (Player player in players)
         {
-            lineRendererController.Value.SetColor(lineRendererController.Key.color);
-            lineRendererController.Value.lineRenderer.LineThickness = 2;
+            _lineRenderers[player].SetColor(player.Color);
+            _lineRenderers[player].lineRenderer.LineThickness = 2;
         }
     }
 
-    private void OnMouseHover(Player player)
-    {
-        foreach (KeyValuePair<Player,LineRendererController> lineRendererController in _lineRenderers)
+    private void OnSetDeselected(List<Player> players)
+    { 
+        foreach (Player player in players)
         {
-            if (lineRendererController.Key != player)
-            {
-                lineRendererController.Value.SetColor(Color.grey);
-            }
-            else
-            {
-                lineRendererController.Value.gameObject.transform.SetAsLastSibling();
-                lineRendererController.Value.lineRenderer.LineThickness = 4;
-            }
+            Color32 mutedColor = player.Color;
+            mutedColor.a = 60;
+            
+            _lineRenderers[player].SetColor(mutedColor);
+            _lineRenderers[player].lineRenderer.LineThickness = 2;
+        }
+    }
+
+    private void OnSetSelected(List<Player> players)
+    {
+        foreach (var player in players)
+        {
+            _lineRenderers[player].SetColor(player.Color);
+            _lineRenderers[player].gameObject.transform.SetAsLastSibling();
+            _lineRenderers[player].lineRenderer.LineThickness = 4;
+
         }
     }
 
@@ -148,11 +158,11 @@ public class Graph : MonoBehaviour
         
         //Setting color of the line renderer
         LineRendererController newLineRendererController = newLineRenderer.GetComponent<LineRendererController>();
-        newLineRendererController.SetColor(player.color);
+        newLineRendererController.SetColor(player.Color);
         
         _lineRenderers.Add(player,newLineRendererController);
         
-        AddDataPoint(new DataPoint(0,0,0),player);
+        AddDataPoint(new DataPoint(0,0,0,0,0),player);
     }
 
     /// <summary>
@@ -165,14 +175,16 @@ public class Graph : MonoBehaviour
         //Checking if new point is setting any new max values
         if (point.avgSip > _highestAvgSip) _highestAvgSip = point.avgSip;
         if (point.numberOfSips > _highestSipCount) _highestSipCount = point.numberOfSips;
-        
+        if (point.avgTime > _highestAvgTime) _highestAvgTime = point.avgTime;
+        if (point.turnTime > _highestTurnTime) _highestTurnTime = point.turnTime;
+
         //The spawn position is not it's final position. This is merely the position it waits, before being animated to its final position.
         Vector2 pointSpawnPos = GetGraphPosition(new Vector2(_lineRenderers[player].lastPoint[0],_lineRenderers[player].lastPoint[_dataPointFetchIndex]));
         
         //Creating the new point and placing it at the spawn position
         GameObject go = Instantiate(graphPoint, new Vector3(0,0,0), Quaternion.Euler(0, 0, 0), horizontalSeparators[0].transform.parent);
         go.GetComponent<RectTransform>().localPosition = pointSpawnPos;
-        go.GetComponent<Image>().color = player.color;
+        go.GetComponent<Image>().color = player.Color;
         
         //Adding the new point to our the required list and dictionaries 
         _lineRenderers[player].graphPoints.Add(go,point);
@@ -205,7 +217,9 @@ public class Graph : MonoBehaviour
             {
                 AddHorizontalSeparator();
             }
+            UpdateHorizontalSeparatorPositions();
         }
+        
         
         //Checks if the value is represented on the vertical axis. If now, the graph will be expanded vertically
         if (point[_dataPointFetchIndex] > _maxVerticalValue)
@@ -216,7 +230,9 @@ public class Graph : MonoBehaviour
             {
                 AddVerticalSeparator();
             }
+            UpdateVerticalSeparatorPositions();
         }
+        
     }
 
     /// <summary>
@@ -242,6 +258,7 @@ public class Graph : MonoBehaviour
                 } 
             }
         }
+        UpdateVerticalSeparatorPositions();
 
     }
     
@@ -254,11 +271,20 @@ public class Graph : MonoBehaviour
         foreach (KeyValuePair<GameObject,DataPoint> dataPoint in lineRendererController.graphPoints)
         {
             int y = i;
-            LeanTween.moveLocal(dataPoint.Key, GetGraphPosition(new Vector2(dataPoint.Value[0],dataPoint.Value[_dataPointFetchIndex])), animationSpeed).setEase(LeanTweenType.easeInOutQuad).setOnUpdateVector3(vector3 =>
+            try
             {
-                lineRendererController.lineRenderer.Points[y] = new Vector2(vector3.x, vector3.y);
-                lineRendererController.lineRenderer.SetAllDirty();  //Don't know what this does, but it makes my code work
-            });
+                LeanTween.moveLocal(dataPoint.Key, GetGraphPosition(new Vector2(dataPoint.Value[0],dataPoint.Value[_dataPointFetchIndex])), animationSpeed).setEase(LeanTweenType.easeInOutQuad).setOnUpdateVector3(vector3 =>
+                {
+                    lineRendererController.lineRenderer.Points[y] = new Vector2(vector3.x, vector3.y);
+                    lineRendererController.lineRenderer.SetAllDirty();  //Don't know what this does, but it makes my code work
+                });
+            }
+            catch (Exception e)
+            {
+                Debug.Log("GOT IT : GRAPH");
+                Console.WriteLine(e);
+            }
+            
             
             i++;
         }
@@ -323,7 +349,7 @@ public class Graph : MonoBehaviour
         verticalSeparators.Add(newVerticalSeparator);
         verticalSeparatorText.Add(newVerticalSeparatorText.GetComponent<TextMeshProUGUI>());
         
-        UpdateVerticalSeparatorPositions();
+        //UpdateVerticalSeparatorPositions();
     }
 
     /// <summary>
@@ -343,7 +369,7 @@ public class Graph : MonoBehaviour
         Destroy(verticalSeparatorText[lastSeparatorIndex].gameObject,2);
         verticalSeparatorText.RemoveAt(lastSeparatorIndex);
         
-        UpdateVerticalSeparatorPositions();
+        //UpdateVerticalSeparatorPositions();
     }
     
     /// <summary>
@@ -431,7 +457,7 @@ public class Graph : MonoBehaviour
             UpdatePointPositions(uiLineRenderer.GetComponent<LineRendererController>());
         }*/
         
-        UpdateHorizontalSeparatorPositions();
+        //UpdateHorizontalSeparatorPositions();
     }
     
     /// <summary>
@@ -485,14 +511,12 @@ public class Graph : MonoBehaviour
 
     public void ShowAvgSipGraph()
     {
-        verticalSeparatorStepIncrement = 1;
+        verticalSeparatorStepIncrement = 5;
         _maxVerticalValue = verticalSeparatorStepIncrement * (verticalSeparators.Count-1);
 
         _dataPointFetchIndex = 2;
 
-        CheckAndExpandAxis(new DataPoint(0,0,_highestAvgSip),true);
-
-        UpdateVerticalSeparatorPositions();
+        CheckAndExpandAxis(new DataPoint(0,0,_highestAvgSip,0,0),true);
 
         foreach (KeyValuePair<Player,LineRendererController> lr in _lineRenderers)
         {
@@ -502,15 +526,44 @@ public class Graph : MonoBehaviour
 
     public void ShowBeerCountGraph()
     {
-        verticalSeparatorStepIncrement = _verticalSeparatorStepIncrementSaved;
+        //verticalSeparatorStepIncrement = _verticalSeparatorStepIncrementSaved;
+        verticalSeparatorStepIncrement = 15;
         _maxVerticalValue = verticalSeparatorStepIncrement * (verticalSeparators.Count-1);
         
         _dataPointFetchIndex = 1;
         
-        CheckAndExpandAxis(new DataPoint(0,_highestSipCount,0),true);
+        CheckAndExpandAxis(new DataPoint(0,_highestSipCount,0,0,0),true);
         
-        UpdateVerticalSeparatorPositions();
+        foreach (KeyValuePair<Player,LineRendererController> lr in _lineRenderers)
+        {
+            UpdatePointPositions(lr.Value);
+        }
+    }
+
+    public void ShowAvgTimeGraph()
+    {
+        verticalSeparatorStepIncrement = 2;
+        _maxVerticalValue = verticalSeparatorStepIncrement * (verticalSeparators.Count-1);
+
+        _dataPointFetchIndex = 4;
         
+        CheckAndExpandAxis(new DataPoint(0,0,0,0,_highestAvgTime),true);
+        
+        foreach (KeyValuePair<Player,LineRendererController> lr in _lineRenderers)
+        {
+            UpdatePointPositions(lr.Value);
+        }
+    }
+
+    public void ShowTurnTimes()
+    {
+        verticalSeparatorStepIncrement = 5;
+        _maxVerticalValue = verticalSeparatorStepIncrement * (verticalSeparators.Count-1);
+
+        _dataPointFetchIndex = 3;
+        
+        CheckAndExpandAxis(new DataPoint(0,0,0,_highestTurnTime,0),true);
+
         foreach (KeyValuePair<Player,LineRendererController> lr in _lineRenderers)
         {
             UpdatePointPositions(lr.Value);
@@ -536,7 +589,7 @@ public class GraphEditor : Editor
         }
         if (GUILayout.Button("Add Player"))
         {
-            graph.AddNewPlayer(new Player(1,"Mathias",MyResources.current.GetColor(1)));
+            graph.AddNewPlayer(new Player(1,"Mathias",14,false,MyResources.current.GetColor(1)));
         }
         GUILayout.Space(10);
         if (GUILayout.Button("Add Horizontal Separator"))

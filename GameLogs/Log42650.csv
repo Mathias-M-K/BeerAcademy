@@ -1,0 +1,63 @@
+Game Started:,7/15/2021 11:53:13 PM
+00:00:00,Frederik,Heart, 9
+00:00:02,Andreas,Circle, 13
+00:00:03,Sækker,Heart, 13
+00:00:04,Mathias,Spade, 7
+00:00:05,Steffen,Circle, 14
+Chuck!,Steffen,00:06:053
+00:00:22,Anton,Penis, 9
+00:00:23,Frederik,Circle, 7
+00:00:24,Andreas,Diamond, 4
+00:00:24,Sækker,Club, 9
+00:00:25,Mathias,Spade, 10
+00:00:26,Steffen,Diamond, 11
+00:00:26,Anton,Club, 12
+00:00:27,Frederik,Club, 6
+00:00:28,Andreas,Heart, 14
+Chuck!,Andreas,00:06:045
+00:00:40,Sækker,Penis, 8
+00:00:41,Mathias,Club, 5
+00:00:41,Steffen,Diamond, 6
+00:00:42,Anton,Diamond, 13
+00:00:42,Frederik,Club, 10
+00:00:43,Andreas,Spade, 12
+00:00:44,Sækker,Spade, 5
+00:00:44,Mathias,Club, 2
+00:00:45,Steffen,Club, 4
+00:00:45,Anton,Heart, 4
+00:00:46,Frederik,Penis, 10
+00:00:47,Andreas,Spade, 3
+00:00:47,Sækker,Diamond, 12
+00:00:48,Mathias,Heart, 6
+00:00:49,Steffen,Club, 7
+00:00:49,Anton,Penis, 13
+00:00:50,Frederik,Penis, 11
+00:00:50,Andreas,Diamond, 10
+00:00:51,Sækker,Spade, 9
+00:00:52,Mathias,Heart, 11
+00:00:52,Steffen,Penis, 12
+00:00:53,Anton,Heart, 2
+00:00:53,Frederik,Spade, 6
+00:00:54,Andreas,Club, 13
+00:00:54,Sækker,Circle, 4
+00:00:55,Mathias,Circle, 6
+00:00:56,Steffen,Diamond, 8
+00:00:56,Anton,Heart, 8
+00:00:57,Frederik,Heart, 3
+00:00:57,Andreas,Circle, 9
+00:00:58,Sækker,Club, 11
+00:00:58,Mathias,Heart, 5
+00:00:59,Steffen,Club, 3
+00:01:00,Anton,Heart, 7
+00:01:00,Frederik,Diamond, 9
+00:01:01,Andreas,Diamond, 14
+Chuck!,Andreas,00:03:534
+Game Ended,00:01:10
+name,nr of beers,nr of sips,avg Sips,time Total,avg Time
+Frederik,5.071429,71,7.888889,00:00:05.2757576,00:00:00.5860000
+Andreas,6.571429,92,10.22222,00:00:07.6885274,00:00:00.8540000
+Sækker,5.071429,71,8.875,00:00:05.6479646,00:00:00.7060000
+Mathias,3.714286,52,6.5,00:00:05.0000669,00:00:00.6250000
+Steffen,4.642857,65,8.125,00:00:05.2997378,00:00:00.6620000
+Anton,4.857143,68,8.5,00:00:05.2942443,00:00:00.6620000
+File End

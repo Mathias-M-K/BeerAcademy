@@ -33,7 +33,6 @@ public class PlayerCardsManager : MonoBehaviour
         
         //Running setup for player cards
         StartCoroutine(SetGridDimensions());
-        
     }
 
     private void SetupPlayerCards()
@@ -44,6 +43,7 @@ public class PlayerCardsManager : MonoBehaviour
         //editing preexisting player-card to match first player
         PlayerCard playerCard = playerCardTemplate.GetComponent<PlayerCard>();
         playerCard.SetInfo(players[0]);
+        playerCard.SetColor(players[0].Color);
         
         _playerCards.Add(players[0],playerCard);
 
@@ -54,9 +54,15 @@ public class PlayerCardsManager : MonoBehaviour
             
             PlayerCard pc = newPlayerCard.GetComponent<PlayerCard>();
             pc.SetInfo(players[i]);
+            playerCard.SetColor(players[i].Color);
             
             _playerCards.Add(players[i],pc);
         }
+    }
+    
+    public void UpdatePlayer(Player player)
+    {
+        _playerCards[player].SetInfo(player);
     }
 
     private IEnumerator SetGridDimensions()
@@ -101,11 +107,6 @@ public class PlayerCardsManager : MonoBehaviour
             _gridLayout.cellSize = new Vector2(cardWidth, cardHeight);
             _gridLayout.spacing = new Vector2(horizontalSpacing, verticalSpacing);
         }
-    }
-    
-    public void UpdatePlayer(Player player)
-    {
-        _playerCards[player].SetInfo(player);
     }
 }
 

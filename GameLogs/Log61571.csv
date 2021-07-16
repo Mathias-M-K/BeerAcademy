@@ -1,0 +1,35 @@
+Game Started:,7/15/2021 7:19:28 PM
+00:00:00,Mathias,Diamond, 8
+00:00:00,Frederik,Diamond, 10
+00:00:00,Steffen,Spade, 11
+00:00:00,Andreas,Circle, 3
+00:00:00,Lasse,Penis, 8
+00:00:00,Jakob,Heart, 13
+00:00:01,Mathias,Diamond, 5
+00:00:01,Frederik,Spade, 6
+00:00:01,Steffen,Heart, 9
+00:00:01,Andreas,Spade, 10
+00:00:01,Lasse,Circle, 14
+Chuck!,Lasse,00:00:189
+00:00:02,Jakob,Circle, 9
+00:00:02,Mathias,Spade, 9
+00:00:02,Frederik,Penis, 11
+00:00:03,Steffen,Club, 9
+00:00:03,Andreas,Club, 4
+00:00:03,Lasse,Penis, 12
+00:00:03,Jakob,Penis, 5
+00:00:03,Mathias,Spade, 8
+00:00:04,Frederik,Heart, 6
+00:00:04,Steffen,Penis, 10
+00:00:04,Andreas,Heart, 3
+00:00:04,Lasse,Heart, 2
+00:00:05,Jakob,Heart, 4
+Game Ended,00:00:28
+name,nr of beers,nr of sips,avg Sips,time Total,avg Time
+Mathias,2.142857,30,7.5,00:00:00.5226336,00:00:00.1310000
+Frederik,2.357143,33,8.25,00:00:00.7322798,00:00:00.1830000
+Steffen,2.785714,39,9.75,00:00:00.6739691,00:00:00.1680000
+Andreas,1.428571,20,5,00:00:00.7616114,00:00:00.1900000
+Lasse,2.571429,36,9,00:00:00.7285326,00:00:00.1820000
+Jakob,2.214286,31,7.75,00:00:01.4390850,00:00:00.3600000
+File End

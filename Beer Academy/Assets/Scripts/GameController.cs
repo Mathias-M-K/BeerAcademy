@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using Data_Types;
 using PauseScreenAndSettings;
+using SupportClasses;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using Random = UnityEngine.Random;
 
@@ -24,123 +27,104 @@ public class GameController : MonoBehaviour
 
     [Header("Game Settings")] 
     public List<string> playerNames;
-    public int sipsInABeer;
-    private readonly List<Player> _players = new List<Player>();
-    private int _currentPlayer = 0;
-    
+
     [Header("Card Flipping Elements")]
     public GameObject currentCardPos;
     public GameObject nextCardPos;
+    private Card _currentCard;
     private Card _nextCard;
 
-    //UI
+    [Header("UI Elements")]
+    public TextMeshProUGUI previusPlayerText;
+    public TextMeshProUGUI waitingForPlayerText;
+
+    public TextMeshProUGUI playerTimerText;
+    
+    private TextMeshProUGUI _roundCounterText;
+    private TextMeshProUGUI _gameTimerText;
+    private TextMeshProUGUI _currentPlayerNameText;
+
+    
+    //Game Functionality
     private Dictionary<int,TextMeshProUGUI> _cardCounters;
     private readonly Dictionary<int, int> _cardCounterValues = new Dictionary<int, int>();
     private Dictionary<Player, PlayerCard> _playerCards = new Dictionary<Player, PlayerCard>();
-    private TextMeshProUGUI _roundCounterText;
-    private TextMeshProUGUI _timerText;
-    private TextMeshProUGUI _currentPlayerName;
-
-    //Game Functionality
-    private readonly List<Card> _cards = new List<Card>();
-    private bool _gameOver;
     
-    //Timer
+    private readonly List<Card> _cards = new List<Card>();
+    private readonly List<Player> _players = new List<Player>();
+    
+    private bool _gameOver;
+    private int _roundCounter = 1;
+    private int _currentPlayerIndex = 1;
+
+    private Player _currentPlayer;
+    private Player _nextPlayer;
+    private Player _previousPlayer;
+    private bool _gameJustStarted = true;
+    
+
+
+
+    //Game Timer
+    [HideInInspector] public TimeSpan ElapsedGameTime;
+    
     private bool _timerStarted = false;
     private DateTime _startTime;
+    
+    public Timer gameTimer;
+    public Timer playerTimer;
+    
+    //Player Timer
+    [HideInInspector] public TimeSpan ElapsedPlayerTime;
+    
+    private DateTime _playerStartTime;
 
-    private DateTime _pauseStartTime;
+    //Pause
     private bool _gamePaused;
-
+    private DateTime _pauseStartTime;
     private TimeSpan _totalTimeoutTime;
 
-    //private List<TimeSpan> _timeouts = new List<TimeSpan>();
+    private bool _playerTimePaused;
+    private DateTime _playerPauseStartTime;
+    private TimeSpan _totalTimeoutTimePlayer;
     
-    //Counter 
-    private int _roundCounter = 1;
-
+    
+    //Events
+    public event Action SpacePressed;
+    
+    
     private void Start()
     {
-        //nextCardPos.SetActive(false);
+        StatTracker.statTracker.StartTracking();
+        
         currentCardPos.SetActive(false);
         
         _cardCounters = GetCardCounters();
         _roundCounterText = GameObject.FindGameObjectWithTag("RoundCounter").GetComponent<TextMeshProUGUI>();
-        _timerText = GameObject.FindGameObjectWithTag("Timer").GetComponent<TextMeshProUGUI>();
-        _currentPlayerName = GameObject.FindGameObjectWithTag("CurrentPlayerName").GetComponent<TextMeshProUGUI>();
+        _gameTimerText = GameObject.FindGameObjectWithTag("Timer").GetComponent<TextMeshProUGUI>();
+        _currentPlayerNameText = GameObject.FindGameObjectWithTag("CurrentPlayerName").GetComponent<TextMeshProUGUI>();
+
+        CardSetup();
+
+        _currentPlayer = _players[0];
+        _nextPlayer = _players[1];
+        _previousPlayer = _players[0];
+        UpdateCurrentAndNextPlayerTextFields();
+
+        previusPlayerText.text = "";
         
-        SetUp();
-        
-        _nextCard = SpawnCard(GetRandomCard());
-        nextCardPos.SetActive(false);
+        _nextCard = SpawnCard(GetRandomCard(_currentPlayer.IsProtected));
+        //nextCardPos.SetActive(false);
         
         
         //Subscribing to pause events
         PausePanelController.current.Pause += OnPause;
         PausePanelController.current.Unpause += OnUnPause;
+        ChuckPanelController.current.ChuckPanelClose += OnChuckPanelClose;
     }
+    
 
-    private void OnUnPause()
-    {
-        if (!_timerStarted) return;
-
-        _gamePaused = false;
-
-        TimeSpan timeout = DateTime.Now - _pauseStartTime;
-
-        _totalTimeoutTime += timeout;
-    }
-
-    private void OnPause()
-    {
-        if (!_timerStarted) return;
-        
-        _pauseStartTime = DateTime.Now;
-        _gamePaused = true;
-    }
-
-    private void CreatePlayerList()
-    {
-        //TODO This method should be deleted at some point
-        int id = 0;
-        foreach (string playerName in playerNames)
-        {
-            _players.Add(new Player(id,playerName,MyResources.current.GetColor(id)));
-            id++;
-        }
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.Escape))
-        {
-            PausePanelController.current.TogglePanel();
-        }
-
-        if(_timerStarted && !_gamePaused)
-        {
-            TimeSpan we = DateTime.Now - _startTime;
-
-            we -= _totalTimeoutTime;
-            
-            _timerText.text = $"{we.Hours:00}:{we.Minutes:00}:{we.Seconds:00}";
-        }
-
-
-        if (Input.GetKeyDown(KeyCode.Space) && !_gameOver && !ChuckPanelController.current.timerActive && !PausePanelController.current.panelActive)
-        {
-            if (!_timerStarted)
-            {
-                _startTime = DateTime.Now;
-                _timerStarted = true;
-            }
-
-            ShowNextCard();
-        }
-    }
-
-    private void SetUp()
+    private void CardSetup()
     {
         //Creating a deck of cards for each player
         for (int i = 2; i <= 14; i++)
@@ -153,61 +137,92 @@ public class GameController : MonoBehaviour
         SetAllCounters(_players.Count);
     }
 
-    /// <summary>
-    /// Returns next player in line, and progress the round if all players have drawn a card
-    /// </summary>
-    /// <returns>Next Player</returns>
-    private Player GetNextPlayer()
+    private void CreatePlayerList()
     {
-        if (_currentPlayer >= _players.Count)
-        {
-            _currentPlayer = 0;
-            _roundCounter++;
-            Table.current.AddRow(_roundCounter);
-        }
-        _roundCounterText.text = $"Round:{_roundCounter}";
+        List<string> newPlayers;
+        int id = 0;
         
-        Player currentPlayer = _players[_currentPlayer];
-        _currentPlayer++;
-
-        return currentPlayer;
+        if (GlobalValueContainer.Container == null)
+        {
+            newPlayers = playerNames;
+        }
+        else
+        {
+            newPlayers = GlobalValueContainer.Container.players;
+        }
+        
+        foreach (string playerName in newPlayers)
+        {
+            _players.Add(new Player(id,playerName,GlobalValueContainer.Container.playerSips[id],GlobalValueContainer.Container.playerProtectedStatus[id],MyResources.current.GetColor(id)));
+            id++;
+            
+        }
     }
 
-    public List<Player> GetAllPlayers()
+    private void Update()
     {
-        return _players;
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            PausePanelController.current.TogglePanel();
+        }
+
+        if(_timerStarted && !_gamePaused)
+        {
+            UpdateGameTime();
+            
+            
+            if(_playerTimePaused) return;
+            UpdatePlayerTime();
+        }
+        
+        if (Input.GetKeyDown(KeyCode.Space) && !_gameOver && !ChuckPanelController.current.timerActive && !PausePanelController.current.panelActive)
+        {
+            if (!_timerStarted)
+            {
+                _startTime = DateTime.Now;
+                _timerStarted = true;
+            }
+            _playerStartTime = DateTime.Now;
+            _totalTimeoutTimePlayer = TimeSpan.FromMinutes(0);
+
+            //Notifying listeners
+            OnSpacePressed();
+            
+            //progress game
+            ShowNextCard();
+        }
     }
 
     private void ShowNextCard()
     {
-        Player currentPlayer = GetNextPlayer();
-
         Card newNextCard = null;
         
         if (_nextCard.rank == 14)
         {
-            ChuckPanelController.current.ShowTimer(currentPlayer,_nextCard.suit);
-        }
-        
-        if (_cards.Count > 0)
-        {
-            newNextCard = SpawnCard(GetRandomCard());
+            ChuckPanelController.current.ShowTimer(_currentPlayer,_nextCard.suit);
+            PausePlayerTimer();
+
+            _currentPlayer.Sips += _currentPlayer.SipsInABeer;
         }
         else
         {
-            _gameOver = true;
+            _currentPlayer.Sips += _nextCard.rank;
         }
         
         //Updating player with new info
+        _currentPlayer.AvgSips = _currentPlayer.Sips / _roundCounter;
+        _currentPlayer.Beers = _currentPlayer.Sips / _currentPlayer.SipsInABeer;
+
+        _currentPlayer.LastTime = ElapsedPlayerTime;
+        _currentPlayer.TimeTotal += ElapsedPlayerTime;
+        _currentPlayer.AvgTime = TimeSpan.FromSeconds(_currentPlayer.TimeTotal.TotalSeconds / _roundCounter);
+
+        //if (_nextCard.rank == 14) _currentPlayer.sips--;
         
-        currentPlayer.sips += _nextCard.rank;
-        currentPlayer.avgSips = currentPlayer.sips / _roundCounter;
-        currentPlayer.beers = currentPlayer.sips / sipsInABeer;
-        if (_nextCard.rank == 14) currentPlayer.sips--;
+        StatTracker.statTracker.Log(ElapsedGameTime,_nextCard,_currentPlayer);
         
-        //Updating text
-        _currentPlayerName.text = currentPlayer.name;
-        _currentPlayerName.color = currentPlayer.color;
+        //Updating round counter
+        _roundCounterText.text = $"Round:{_roundCounter}";
 
         //Moving card to the used-cards stack and flipping it so it faces up
         LeanTween.move(_nextCard.cardObj, currentCardPos.transform.position, 0.5f).setEase(LeanTweenType.easeInOutQuad);
@@ -219,15 +234,124 @@ public class GameController : MonoBehaviour
 
         _nextCard.cardObj.transform.SetAsLastSibling();
         
-        
         //Updating components
-        Graph.current.AddDataPoint(new DataPoint(_roundCounter,currentPlayer.sips,currentPlayer.avgSips),currentPlayer);
-        Table.current.SetFieldValue(currentPlayer,_nextCard.rank);
-        PlayerCardsManager.current.UpdatePlayer(currentPlayer);
+        Graph.current.AddDataPoint(new DataPoint(_roundCounter,_currentPlayer.Sips,_currentPlayer.AvgSips,(float)_currentPlayer.LastTime.TotalSeconds,(float)_currentPlayer.AvgTime.TotalSeconds),_currentPlayer);
+        Table.current.SetFieldValue(_currentPlayer,_nextCard.rank);
+        PlayerCardsManager.current.UpdatePlayer(_currentPlayer);
         
+        //Getting next player
+        _currentPlayer = GetNextPlayerInLine();
         
+        //Updating text
+        UpdateCurrentAndNextPlayerTextFields();
+        
+        if (_cards.Count > 0)
+        {
+            newNextCard = SpawnCard(GetRandomCard(_currentPlayer.IsProtected));
+        }
+        else
+        {
+            _gameOver = true;
+            OnPause();
+
+            if (!ChuckPanelController.current.timerActive)
+            {
+                StartCoroutine(EndGame(3));
+            }
+        }
+        
+        //Updating card
         _nextCard = newNextCard;
-       
+    }
+    
+    private void UpdateCurrentAndNextPlayerTextFields()
+    {
+        //Current Player
+        waitingForPlayerText.text = $"<color=white>Now drawing:</color> {_currentPlayer.Name}";
+        waitingForPlayerText.color = _currentPlayer.Color;
+        
+        _currentPlayerNameText.text = _currentPlayer.Name;
+        _currentPlayerNameText.color = _currentPlayer.Color;
+
+
+        if (_gameJustStarted)
+        {
+            _gameJustStarted = false;
+        }
+        else
+        {
+            previusPlayerText.text = $"{_previousPlayer.Name} <color=white>Got {_nextCard.rank} sips </color>";
+        
+            if(_nextCard.rank == 14) previusPlayerText.text = $"{_previousPlayer.Name} <color=white>Got an ACE! </color>";
+            previusPlayerText.color = _previousPlayer.Color; 
+        }
+        
+    }
+    
+    private void UpdateGameTime()
+    {
+        TimeSpan tempElapsedGameTime = DateTime.Now - _startTime;
+        tempElapsedGameTime -= _totalTimeoutTime;
+        ElapsedGameTime = tempElapsedGameTime;
+        gameTimer.SetTimer(ElapsedGameTime);
+    }
+
+    private void UpdatePlayerTime()
+    {
+        ElapsedPlayerTime = DateTime.Now - _playerStartTime;
+        ElapsedPlayerTime -= _totalTimeoutTimePlayer;
+        playerTimer.SetTimer(ElapsedPlayerTime);
+    }
+    
+    private void OnChuckPanelClose()
+    {
+
+        if (_gameOver)
+        {
+            StartCoroutine(EndGame(3));
+        }
+        else
+        {
+            UnpausePlayerTimer();  
+        }
+        
+    }
+    
+    private void OnPause()
+    {
+        if (!_timerStarted) return;
+        
+        _pauseStartTime = DateTime.Now;
+        _gamePaused = true;
+        
+        PausePlayerTimer();
+    }
+
+    private void OnUnPause()
+    {
+        if (!_timerStarted) return;
+
+        _gamePaused = false;
+
+        TimeSpan timeout = DateTime.Now - _pauseStartTime;
+
+        _totalTimeoutTime += timeout;
+
+        if (ChuckPanelController.current.timerActive) return;
+        UnpausePlayerTimer();
+    }
+    
+    private void PausePlayerTimer()
+    {
+        _playerPauseStartTime = DateTime.Now;
+        _playerTimePaused = true;
+    }
+
+    private void UnpausePlayerTimer()
+    {
+        _playerTimePaused = false;
+        TimeSpan ts = DateTime.Now - _playerPauseStartTime;
+        _totalTimeoutTimePlayer += ts;
     }
 
     private Card SpawnCard(Card cardToSpawn)
@@ -262,11 +386,57 @@ public class GameController : MonoBehaviour
         return cardToSpawn;
     }
     
-    private Card GetRandomCard()
+    /// <summary>
+    /// Returns next player in line, and progress the round if all players have drawn a card
+    /// </summary>
+    /// <returns>Next Player</returns>
+    private Player GetNextPlayerInLine()
+    {
+        if (_currentPlayerIndex >= _players.Count)
+        {
+            _currentPlayerIndex = 0;
+            _roundCounter++;
+            
+            //Check if we need a new row
+            Table.current.AddRow(_roundCounter);
+        }
+
+        _currentPlayer = _players[_currentPlayerIndex];
+        
+        //finding next player
+        int nextPlayerIndex = _currentPlayerIndex + 1;
+        if (nextPlayerIndex >= _players.Count) nextPlayerIndex = 0;
+        _nextPlayer = _players[nextPlayerIndex];
+
+        //Finding Previous Player
+        int previousPlayerIndex = _currentPlayerIndex - 1;
+        if (previousPlayerIndex < 0) previousPlayerIndex = _players.Count-1;
+        _previousPlayer = _players[previousPlayerIndex];
+
+        _currentPlayerIndex++;
+
+        //Debug.Log($"Current: {_currentPlayer.name} | Next: {_nextPlayer.name} | Prev: {_previousPlayer.name}");
+        
+        return _currentPlayer;
+    }
+
+    public List<Player> GetAllPlayers()
+    {
+        return _players;
+    }
+    
+    private Card GetRandomCard(bool playerProtected)
     {
         int randomCardNumber = Random.Range(0, _cards.Count);
 
         Card randomCard = _cards[randomCardNumber];
+
+        if (playerProtected && randomCard.rank == 14 && AvoidAcePossible())
+        {
+            randomCardNumber = ReturnIndexOfNonAceCard();
+            randomCard = _cards[randomCardNumber];
+        }
+        
         _cards.RemoveAt(randomCardNumber);
 
         CardDisplay randomCardDisplay = randomCard.cardObj.GetComponent<CardDisplay>();
@@ -274,6 +444,33 @@ public class GameController : MonoBehaviour
         randomCardDisplay.SetRank(randomCard.rank);
 
         return randomCard;
+    }
+
+    private bool AvoidAcePossible()
+    {
+        foreach (Card card in _cards)
+        {
+            if (card.rank != 14) return true;
+        }
+        return false;
+    }
+
+    private int ReturnIndexOfNonAceCard()
+    {
+        List<int> nonAceCardIndexes = new List<int>();
+
+        int i = 0;
+        foreach (Card card in _cards)
+        {
+            if (card.rank != 14)
+            {
+                nonAceCardIndexes.Add(i);
+            }
+
+            i++;
+        }
+
+        return Random.Range(0, nonAceCardIndexes.Count);
     }
     
 
@@ -347,5 +544,48 @@ public class GameController : MonoBehaviour
         }
 
         return times;
+    }
+    
+    /*
+     * Event Invokers
+     */
+    private void OnSpacePressed()
+    {
+        SpacePressed?.Invoke();
+    }
+
+    public void NextCardKeyPressed()
+    {
+        Debug.Log("Key pressed");
+        
+        if (_gameOver || ChuckPanelController.current.timerActive || PausePanelController.current.panelActive) return;
+        
+        if (!_timerStarted)
+        {
+            _startTime = DateTime.Now;
+            _timerStarted = true;
+        }
+        _playerStartTime = DateTime.Now;
+        _totalTimeoutTimePlayer = TimeSpan.FromMinutes(0);
+
+        //Notifying listeners
+        OnSpacePressed();
+            
+        //progress game
+        ShowNextCard();
+    }
+
+    public IEnumerator EndGame(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        StatTracker.statTracker.EndLog(ElapsedGameTime,_players);
+        GlobalValueContainer.Container.PlayerResults = _players;
+        SceneManager.LoadScene(2);
+    }
+
+
+    private void OnApplicationQuit()
+    {
+        StatTracker.statTracker.EndLog(ElapsedGameTime,_players);
     }
 }

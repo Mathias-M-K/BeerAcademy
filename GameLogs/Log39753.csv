@@ -1,0 +1,49 @@
+Game Started:,7/16/2021 1:29:46 PM
+00:00:00,Abe,Spade, 6
+00:00:00,Banen,Spade, 13
+00:00:00,Cirkus,Heart, 12
+00:00:00,Abe,Club, 7
+00:00:01,Banen,Club, 11
+00:00:01,Cirkus,Heart, 5
+00:00:01,Abe,Spade, 11
+00:00:01,Banen,Spade, 7
+00:00:02,Cirkus,Club, 8
+00:00:02,Abe,Spade, 8
+00:00:02,Banen,Spade, 12
+00:00:03,Cirkus,Heart, 6
+00:00:03,Abe,Club, 6
+00:00:03,Banen,Heart, 2
+00:00:03,Cirkus,Club, 14
+Chuck!,Cirkus,00:03:330
+00:00:08,Abe,Spade, 9
+00:00:09,Banen,Club, 4
+00:00:09,Cirkus,Club, 3
+00:00:09,Abe,Club, 5
+00:00:10,Banen,Heart, 4
+00:00:10,Cirkus,Club, 13
+00:00:10,Abe,Club, 9
+00:00:11,Banen,Spade, 14
+Chuck!,Banen,00:02:718
+00:00:15,Cirkus,Spade, 3
+00:00:16,Abe,Heart, 3
+00:00:16,Banen,Club, 2
+00:00:17,Cirkus,Heart, 7
+00:00:17,Abe,Heart, 8
+00:00:17,Banen,Heart, 11
+00:00:18,Cirkus,Spade, 4
+00:00:18,Abe,Heart, 10
+00:00:18,Banen,Heart, 9
+00:00:18,Cirkus,Heart, 14
+Chuck!,Cirkus,00:03:955
+00:00:26,Abe,Spade, 2
+00:00:27,Banen,Spade, 10
+00:00:27,Cirkus,Heart, 13
+00:00:27,Abe,Spade, 5
+00:00:28,Banen,Club, 12
+00:00:28,Cirkus,Club, 10
+Game Ended,00:00:28
+name,nr of beers,nr of sips,avg Sips,time Total,avg Time
+Abe,6.357143,89,6.846154,00:00:04.6477049,00:00:00.3580000
+Banen,7.928571,111,8.538462,00:00:04.2865126,00:00:00.3300000
+Cirkus,8,112,8.615385,00:00:04.4014615,00:00:00.3390000
+File End

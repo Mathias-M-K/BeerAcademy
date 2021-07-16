@@ -1,0 +1,49 @@
+Game Started:,7/16/2021 10:29:09 AM
+00:00:00,Frederik,Club, 7
+00:00:00,Mathias,Spade, 8
+00:00:01,Koch,Spade, 14
+Chuck!,Koch,00:00:239
+00:00:02,Frederik,Club, 9
+00:00:02,Mathias,Club, 6
+00:00:02,Koch,Spade, 2
+00:00:02,Frederik,Heart, 3
+00:00:02,Mathias,Spade, 4
+00:00:03,Koch,Spade, 7
+00:00:03,Frederik,Club, 4
+00:00:03,Mathias,Spade, 5
+00:00:03,Koch,Club, 11
+00:00:03,Frederik,Heart, 5
+00:00:03,Mathias,Club, 8
+00:00:04,Koch,Heart, 8
+00:00:04,Frederik,Heart, 4
+00:00:04,Mathias,Spade, 10
+00:00:04,Koch,Club, 10
+00:00:04,Frederik,Club, 12
+00:00:04,Mathias,Spade, 9
+00:00:04,Koch,Spade, 12
+00:00:05,Frederik,Spade, 13
+00:00:05,Mathias,Heart, 11
+00:00:05,Koch,Club, 14
+Chuck!,Koch,00:00:154
+00:00:06,Frederik,Club, 2
+00:00:06,Mathias,Spade, 3
+00:00:06,Koch,Heart, 13
+00:00:06,Frederik,Spade, 6
+00:00:06,Mathias,Spade, 11
+00:00:06,Koch,Club, 3
+00:00:06,Frederik,Club, 13
+00:00:07,Mathias,Heart, 12
+00:00:07,Koch,Club, 5
+00:00:07,Frederik,Heart, 14
+Chuck!,Frederik,00:00:156
+00:00:08,Mathias,Heart, 9
+00:00:08,Koch,Heart, 6
+00:00:08,Frederik,Heart, 2
+00:00:08,Mathias,Heart, 7
+00:00:08,Koch,Heart, 10
+Game Ended,00:00:08
+name,nr of beers,nr of sips,avg Sips,time Total,avg Time
+Frederik,6.714286,94,7.230769,00:00:01.8747404,00:00:00.1440000
+Mathias,7.357143,103,7.923077,00:00:02.8268707,00:00:00.2170000
+Koch,8.214286,115,8.846154,00:00:02.2189335,00:00:00.1710000
+File End

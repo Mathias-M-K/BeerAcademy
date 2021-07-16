@@ -1,0 +1,45 @@
+Game Started:,7/15/2021 7:12:40 PM
+00:00:00,Mathias,Circle, 5
+00:00:00,Frederik,Circle, 7
+00:00:00,Lasse,Penis, 4
+00:00:01,Andreas,Heart, 3
+00:00:02,Jakob,Diamond, 6
+00:00:03,Stev,Diamond, 8
+00:00:05,Mathias,Circle, 3
+00:00:06,Frederik,Diamond, 5
+00:00:07,Lasse,Penis, 11
+00:00:08,Andreas,Penis, 3
+00:00:09,Jakob,Heart, 11
+00:00:11,Stev,Spade, 12
+00:00:12,Mathias,Spade, 4
+00:00:13,Frederik,Heart, 4
+00:00:14,Lasse,Penis, 6
+00:00:15,Andreas,Heart, 12
+00:00:17,Jakob,Circle, 10
+00:00:18,Stev,Heart, 13
+00:00:19,Mathias,Club, 13
+00:00:20,Frederik,Circle, 13
+00:00:21,Lasse,Diamond, 13
+00:00:22,Andreas,Heart, 14
+Chuck!,Andreas,00:04:581
+00:00:38,Jakob,Circle, 6
+00:00:39,Stev,Diamond, 10
+00:00:40,Mathias,Heart, 9
+00:00:41,Frederik,Diamond, 7
+00:00:41,Lasse,Penis, 5
+00:00:54,Andreas,Club, 3
+00:00:54,Jakob,Club, 7
+00:00:56,Stev,Spade, 8
+00:00:57,Mathias,Circle, 9
+00:00:58,Frederik,Heart, 5
+00:00:59,Lasse,Circle, 11
+00:00:59,Andreas,Spade, 10
+Game Ended,00:01:02
+name,nr of beers,nr of sips,avg Sips,time Total,avg Time
+Mathias,3.071429,43,7.166667,00:00:05.4637527,00:00:00.9110000
+Frederik,2.928571,41,6.833333,00:00:05.9438235,00:00:00.9910000
+Lasse,3.571429,50,8.333333,00:00:04.8816025,00:00:00.8140000
+Andreas,3.214286,45,7.5,00:00:16.6253192,00:00:02.7710000
+Jakob,2.857143,40,8,00:00:04.8996031,00:00:00.9800000
+Stev,3.642857,51,10.2,00:00:07.1952738,00:00:01.4390000
+File End

@@ -151,5 +151,11 @@ public enum Suit
     Spade,
     Diamond,
     Penis,
-    Circle
+    Circle,
+    Star,
+    Square,
+    Triangle,
+    Thumb,
+    Line,
+    Cross
 }

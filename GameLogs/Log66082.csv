@@ -1,0 +1,79 @@
+Game Started:,7/16/2021 1:44:25 PM
+00:00:00,Mathias,Spade, 8
+00:00:00,Frederik,Heart, 6
+00:00:00,Marianne,Heart, 14
+Chuck!,Marianne,00:01:680
+00:00:03,Stev,Penis, 3
+00:00:04,Koch,Heart, 11
+00:00:04,Mathias,Heart, 4
+00:00:04,Frederik,Diamond, 13
+00:00:04,Marianne,Heart, 8
+00:00:05,Stev,Penis, 8
+00:00:05,Koch,Spade, 11
+00:00:05,Mathias,Diamond, 7
+00:00:06,Frederik,Diamond, 12
+00:00:06,Marianne,Spade, 9
+00:00:06,Stev,Heart, 12
+00:00:06,Koch,Penis, 4
+00:00:07,Mathias,Diamond, 14
+Chuck!,Mathias,00:02:036
+00:00:11,Frederik,Heart, 9
+00:00:11,Marianne,Spade, 10
+00:00:11,Stev,Heart, 13
+00:00:11,Koch,Heart, 5
+00:00:12,Mathias,Spade, 2
+00:00:12,Frederik,Diamond, 11
+00:00:12,Marianne,Diamond, 9
+00:00:13,Stev,Penis, 10
+00:00:13,Koch,Penis, 2
+00:00:13,Mathias,Club, 5
+00:00:13,Frederik,Club, 6
+00:00:14,Marianne,Heart, 3
+00:00:14,Stev,Heart, 2
+00:00:14,Koch,Club, 4
+00:00:14,Mathias,Diamond, 5
+00:00:15,Frederik,Spade, 13
+00:00:15,Marianne,Heart, 10
+00:00:15,Stev,Penis, 11
+00:00:15,Koch,Penis, 14
+Chuck!,Koch,00:00:277
+00:00:17,Mathias,Club, 12
+00:00:17,Frederik,Club, 11
+00:00:17,Marianne,Diamond, 4
+00:00:17,Stev,Club, 13
+00:00:18,Koch,Diamond, 2
+00:00:18,Mathias,Penis, 12
+00:00:18,Frederik,Spade, 4
+00:00:18,Marianne,Spade, 3
+00:00:19,Stev,Penis, 9
+00:00:19,Koch,Club, 3
+00:00:19,Mathias,Spade, 7
+00:00:19,Frederik,Club, 9
+00:00:20,Marianne,Club, 2
+00:00:20,Stev,Diamond, 10
+00:00:20,Koch,Penis, 7
+00:00:21,Mathias,Penis, 5
+00:00:21,Frederik,Diamond, 6
+00:00:21,Marianne,Club, 7
+00:00:21,Stev,Club, 10
+00:00:22,Koch,Diamond, 8
+00:00:22,Mathias,Club, 8
+00:00:22,Frederik,Heart, 7
+00:00:22,Marianne,Spade, 12
+00:00:23,Stev,Spade, 14
+Chuck!,Stev,00:00:246
+00:00:24,Koch,Diamond, 3
+00:00:24,Mathias,Penis, 13
+00:00:24,Frederik,Penis, 6
+00:00:25,Marianne,Club, 14
+Chuck!,Marianne,00:00:296
+00:00:26,Stev,Spade, 6
+00:00:26,Koch,Spade, 5
+Game Ended,00:00:26
+name,nr of beers,nr of sips,avg Sips,time Total,avg Time
+Mathias,7.285714,102,7.846154,00:00:03.2131132,00:00:00.2470000
+Frederik,8.071428,113,8.692307,00:00:03.7859559,00:00:00.2910000
+Marianne,7.5,105,8.076923,00:00:03.4857320,00:00:00.2680000
+Stev,8.642858,121,9.307693,00:00:03.7225878,00:00:00.2860000
+Koch,5.642857,79,6.076923,00:00:03.7234768,00:00:00.2860000
+File End

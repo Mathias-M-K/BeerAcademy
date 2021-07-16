@@ -71,7 +71,7 @@ public class ChuckTimesPanelEditor : Editor
 
         if (GUILayout.Button("Add new chuck"))
         {
-            chuckHistoryPanel.AddNewChuckTime(new Player(1,"Mathias",new Color32(255,0,0,255)),2400,Suit.Spade);
+            chuckHistoryPanel.AddNewChuckTime(new Player(1,"Mathias",14,false,new Color32(255,0,0,255)),2400,Suit.Spade);
         }
 
     }

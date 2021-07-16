@@ -1,0 +1,49 @@
+Game Started:,7/16/2021 1:28:01 PM
+00:00:00,Agger,Club, 6
+00:00:00,Biver,Club, 5
+00:00:00,Charles,Spade, 11
+00:00:01,Agger,Club, 10
+00:00:01,Biver,Heart, 13
+00:00:01,Charles,Spade, 13
+00:00:02,Agger,Heart, 5
+00:00:02,Biver,Club, 9
+00:00:02,Charles,Club, 14
+Chuck!,Charles,00:02:274
+00:00:06,Agger,Spade, 12
+00:00:06,Biver,Club, 11
+00:00:06,Charles,Heart, 4
+00:00:06,Agger,Spade, 2
+00:00:07,Biver,Heart, 14
+Chuck!,Biver,00:05:153
+00:00:13,Charles,Spade, 9
+00:00:13,Agger,Heart, 10
+00:00:14,Biver,Heart, 6
+00:00:14,Charles,Club, 3
+00:00:14,Agger,Spade, 10
+00:00:15,Biver,Club, 7
+00:00:15,Charles,Club, 2
+00:00:15,Agger,Heart, 8
+00:00:16,Biver,Heart, 9
+00:00:16,Charles,Club, 13
+00:00:16,Agger,Spade, 6
+00:00:16,Biver,Spade, 8
+00:00:17,Charles,Spade, 4
+00:00:17,Agger,Club, 8
+00:00:17,Biver,Heart, 2
+00:00:18,Charles,Heart, 7
+00:00:18,Agger,Spade, 3
+00:00:18,Biver,Heart, 11
+00:00:18,Charles,Club, 4
+00:00:19,Agger,Spade, 7
+00:00:19,Biver,Spade, 5
+00:00:19,Charles,Heart, 3
+00:00:20,Agger,Spade, 14
+Chuck!,Agger,00:03:410
+00:00:27,Biver,Club, 12
+00:00:27,Charles,Heart, 12
+Game Ended,00:00:27
+name,nr of beers,nr of sips,avg Sips,time Total,avg Time
+Agger,7.214286,101,7.769231,00:00:03.7625834,00:00:00.2890000
+Biver,8,112,8.615385,00:00:04.7472367,00:00:00.3650000
+Charles,7.071429,99,7.615385,00:00:04.4514981,00:00:00.3420000
+File End

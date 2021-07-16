@@ -1,0 +1,24 @@
+Game Started:,7/15/2021 8:09:09 PM
+00:00:00,Steffen,Club, 8
+00:00:00,Andreas,Club, 3
+00:00:01,Anton,Diamond, 10
+00:00:02,Mathias,Diamond, 4
+00:00:02,Steffen,Heart, 13
+00:00:03,Andreas,Spade, 5
+00:00:03,Anton,Diamond, 5
+00:00:04,Mathias,Diamond, 12
+00:00:04,Steffen,Club, 13
+00:00:05,Andreas,Club, 7
+00:00:05,Anton,Club, 11
+00:00:06,Mathias,Spade, 13
+00:00:06,Steffen,Club, 14
+Chuck!,Steffen,00:06:746
+00:00:20,Andreas,Club, 9
+00:00:23,Anton,Heart, 7
+Game Ended,00:00:25
+name,nr of beers,nr of sips,avg Sips,time Total,avg Time
+Steffen,3.428571,48,12,00:00:01.5069913,00:00:00.3770000
+Andreas,1.714286,24,6,00:00:03.3983095,00:00:00.8500000
+Anton,2.357143,33,8.25,00:00:04.6039376,00:00:01.1510000
+Mathias,2.071429,29,9.666667,00:00:01.6326138,00:00:00.5440000
+File End

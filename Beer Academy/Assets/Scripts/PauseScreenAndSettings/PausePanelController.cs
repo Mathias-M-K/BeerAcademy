@@ -47,6 +47,19 @@ namespace PauseScreenAndSettings
             OnPause();
         }
 
+        public void ShowPanel(bool comingFromSettings)
+        {
+            if (!comingFromSettings)
+            {
+                ShowPanel();
+                return;
+            }
+            
+            LeanTween.moveLocal(gameObject, new Vector3(0,0,0), timeIn).setEase(easeIn);
+            LeanTween.color(background.rectTransform, new Color32(0, 0, 0, 160),0.5f).setEase(LeanTweenType.easeInOutQuad);
+            panelActive = true;
+        }
+
         public void HidePanel()
         {
             LeanTween.moveY(gameObject, _hideYPos, timeOut).setEase(easeOut).setOnComplete(() =>
@@ -87,6 +100,11 @@ namespace PauseScreenAndSettings
         private void OnPause()
         {
             Pause?.Invoke();
+        }
+
+        public void QuitGame()
+        {
+            StartCoroutine(GameController.current.EndGame(1));
         }
     }
 }
